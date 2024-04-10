@@ -1,0 +1,38 @@
+web:
+  host: http://127.0.0.1
+  port: :8088
+  time: 2023-8-16
+script:
+  cmdName: python
+  successMsg: 启动成功
+model:
+  path: ""
+  rootPath: ""
+  dataPath: ""
+  trainPath: ""
+  valiPath: ""
+  testPath: ""
+kafka:
+  topic1: test1
+  topic2: test2
+  finishMsg: finish
+jwt:
+  token: helloWorld
+  issuer: may1145
+redis:
+  addr:  localhost
+  password:
+  db: 0
+  poolsize: 10
+email:
+  account: 2928229132@qq.com
+  password: dgovuilfebztdeae
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  database: yail_test
+  username: root
+  password: Cherry1145
+  charset: utf8mb3
+user:
+  default: 123456

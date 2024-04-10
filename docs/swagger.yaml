@@ -1,0 +1,569 @@
+definitions:
+  model.Device:
+    properties:
+      ID:
+        type: integer
+      engineeringID:
+        type: integer
+      nameOfDevice:
+        type: string
+      numberOfDevice:
+        type: integer
+      typeOfDevice:
+        type: string
+    type: object
+  model.EngineeringJson:
+    properties:
+      ID:
+        type: integer
+      address:
+        type: string
+      beginTime:
+        type: integer
+      constructionUnit:
+        type: string
+      devices:
+        items:
+          $ref: '#/definitions/model.Device'
+        type: array
+      estimatedCompletionTime:
+        type: integer
+      head:
+        type: string
+      name:
+        type: string
+      numberOfConstructors:
+        type: integer
+      progress:
+        type: number
+      state:
+        type: integer
+      wellName:
+        type: string
+    type: object
+  model.Params:
+    properties:
+      activation:
+        type: string
+      anomaly_ratio:
+        type: string
+      batch_size:
+        type: string
+      c_out:
+        type: string
+      checkpoints:
+        type: string
+      d_ff:
+        type: string
+      d_layers:
+        type: string
+      d_model:
+        type: string
+      data:
+        type: string
+      data_path:
+        type: string
+      data_test_path:
+        type: string
+      data_train_path:
+        type: string
+      data_vali_path:
+        type: string
+      dec_in:
+        type: string
+      des:
+        type: string
+      devices:
+        type: string
+      distil:
+        type: string
+      dropout:
+        type: string
+      e_layers:
+        type: string
+      embed:
+        type: string
+      enc_in:
+        type: string
+      factor:
+        type: string
+      features:
+        type: string
+      freq:
+        type: string
+      gpu:
+        type: string
+      is_training:
+        type: string
+      itr:
+        type: string
+      label_len:
+        type: string
+      learning_rate:
+        type: string
+      loss:
+        type: string
+      lradj:
+        type: string
+      mask_rate:
+        type: string
+      model:
+        type: string
+      model_id:
+        type: string
+      moving_avg:
+        type: string
+      n_heads:
+        type: string
+      num_kernels:
+        type: string
+      num_workers:
+        type: string
+      optim:
+        type: string
+      output_attention:
+        type: string
+      p_hidden_dims:
+        type: string
+      p_hidden_layers:
+        type: string
+      patience:
+        type: string
+      pred_len:
+        type: string
+      root_path:
+        type: string
+      scale:
+        type: string
+      seasonal_patterns:
+        type: string
+      seq_len:
+        type: string
+      target:
+        type: string
+      task_name:
+        type: string
+      top_k:
+        type: string
+      train_epochs:
+        type: string
+      use_amp:
+        type: string
+      use_gpu:
+        type: string
+      use_kafka:
+        type: string
+      use_multi_gpu:
+        type: string
+      w_lin:
+        type: string
+    type: object
+  model.UserJson:
+    properties:
+      captcha:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      passWord:
+        type: string
+      role:
+        type: integer
+      userName:
+        type: string
+    type: object
+  model.WellJson:
+    properties:
+      ID:
+        type: integer
+      address:
+        type: string
+      affiliation:
+        type: string
+      averageDailyProduction:
+        type: integer
+      boreholeSize:
+        type: integer
+      construction:
+        type: integer
+      depth:
+        type: integer
+      finishTime:
+        type: integer
+      life:
+        type: integer
+      note:
+        type: string
+      wellName:
+        type: string
+      wellType:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/user/check:
+    get:
+      parameters:
+      - description: 用户名
+        in: formData
+        name: userName
+        required: true
+        type: string
+      responses: {}
+      summary: 检验用户名是否重复
+      tags:
+      - User
+  /api/user/login:
+    post:
+      parameters:
+      - description: 用户名
+        in: formData
+        name: userName
+        required: true
+        type: string
+      - description: 密码
+        in: formData
+        name: passWord
+        required: true
+        type: string
+      responses: {}
+      summary: 登录
+      tags:
+      - User
+  /api/v1/dchan:
+    get:
+      parameters:
+      - description: 会话id
+        in: query
+        name: client_id
+        required: true
+        type: string
+      - description: 是否为流式传输
+        in: query
+        name: is_stream
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 指定形式传输数据
+      tags:
+      - 数据传输模块
+  /api/v1/en/{id}:
+    get:
+      parameters:
+      - description: 施工ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses: {}
+      summary: 查看施工详细信息
+      tags:
+      - Engineering
+  /api/v1/en/all:
+    get:
+      responses: {}
+      summary: 查看全部施工的简述信息
+      tags:
+      - Engineering
+  /api/v1/en/delete:
+    post:
+      parameters:
+      - description: 要删除的施工ID
+        in: formData
+        name: engineeringID
+        required: true
+        type: string
+      responses: {}
+      summary: 删除施工
+      tags:
+      - Engineering
+  /api/v1/en/device/add:
+    post:
+      parameters:
+      - description: 施工设备
+        in: body
+        name: dd
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/model.Device'
+          type: array
+      responses: {}
+      summary: 增加施工设备
+      tags:
+      - Engineering
+  /api/v1/en/device/delete:
+    post:
+      parameters:
+      - collectionFormat: csv
+        description: 要删除的设备ID
+        in: formData
+        items:
+          type: string
+        name: deviceIDs
+        required: true
+        type: array
+      responses: {}
+      summary: 删除施工设备
+      tags:
+      - Engineering
+  /api/v1/en/new:
+    post:
+      parameters:
+      - description: 施工信息
+        in: body
+        name: ed
+        required: true
+        schema:
+          $ref: '#/definitions/model.EngineeringJson'
+      responses: {}
+      summary: 新增施工信息
+      tags:
+      - Engineering
+  /api/v1/en/re:
+    post:
+      parameters:
+      - description: 施工信息
+        in: body
+        name: ed
+        required: true
+        schema:
+          $ref: '#/definitions/model.EngineeringJson'
+      responses: {}
+      summary: 修改施工信息
+      tags:
+      - Engineering
+  /api/v1/path:
+    get:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 文件类型
+        in: query
+        name: file_type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 查看对应类别的路径下有哪些文件
+      tags:
+      - 文件选项模块
+  /api/v1/rs:
+    post:
+      parameters:
+      - description: 脚本运行的参数
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/model.Params'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 运行脚本
+      tags:
+      - 脚本模块
+  /api/v1/upload/csv:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: csv文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 文件类型
+        in: query
+        name: file_type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 上传对应类型的csv文件到对应路径
+      tags:
+      - 上传模块
+  /api/v1/user/all:
+    get:
+      responses: {}
+      summary: 获取全部用户信息
+      tags:
+      - User
+  /api/v1/user/d:
+    post:
+      parameters:
+      - description: uid
+        in: formData
+        name: uid
+        required: true
+        type: string
+      responses: {}
+      summary: 移除用户
+      tags:
+      - User
+  /api/v1/user/info:
+    get:
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses: {}
+      summary: 获取当前登录用户信息
+      tags:
+      - User
+  /api/v1/user/new:
+    post:
+      parameters:
+      - description: 用户信息
+        in: body
+        name: ud
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserJson'
+      responses: {}
+      summary: 用户注册
+      tags:
+      - User
+  /api/v1/user/rp:
+    post:
+      parameters:
+      - description: uid
+        in: formData
+        name: uid
+        required: true
+        type: string
+      responses: {}
+      summary: 重置用户密码
+      tags:
+      - User
+  /api/v1/user/ru:
+    post:
+      parameters:
+      - description: 用户名称
+        in: formData
+        name: name
+        type: string
+      - description: 旧密码
+        in: formData
+        name: oldPassWord
+        type: string
+      - description: 新密码
+        in: formData
+        name: newPassWord
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses: {}
+      summary: 用户修改信息
+      tags:
+      - User
+  /api/v1/user/v:
+    post:
+      parameters:
+      - description: 用户名
+        in: formData
+        name: userName
+        required: true
+        type: string
+      - description: 邮箱
+        in: formData
+        name: email
+        required: true
+        type: string
+      responses: {}
+      summary: 发送验证码
+      tags:
+      - User
+  /api/v1/well/{id}:
+    get:
+      parameters:
+      - description: 井ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses: {}
+      summary: 获取井的详细信息
+      tags:
+      - Well
+  /api/v1/well/all:
+    get:
+      responses: {}
+      summary: 获取所有井信息
+      tags:
+      - Well
+  /api/v1/well/d:
+    post:
+      parameters:
+      - description: 井ID
+        in: body
+        name: wellID
+        required: true
+        schema:
+          type: integer
+      responses: {}
+      summary: 删除井信息
+      tags:
+      - Well
+  /api/v1/well/new:
+    post:
+      parameters:
+      - description: 井信息
+        in: body
+        name: wd
+        required: true
+        schema:
+          $ref: '#/definitions/model.WellJson'
+      responses: {}
+      summary: 新增井信息
+      tags:
+      - Well
+  /api/v1/well/rw:
+    post:
+      parameters:
+      - description: 井信息
+        in: body
+        name: wd
+        required: true
+        schema:
+          $ref: '#/definitions/model.WellJson'
+      responses: {}
+      summary: 编辑井信息
+      tags:
+      - Well
+swagger: "2.0"
