@@ -1,10 +1,10 @@
 web:
-  host: http://127.0.0.1
-  port: :8088
-  time: 2023-8-16
+  host: ""
+  port: ""
+  time: ""
 script:
-  cmdName: python
-  successMsg: 启动成功
+  cmdName: ""
+  successMsg: ""
 model:
   path: ""
   rootPath: ""
@@ -13,26 +13,26 @@ model:
   valiPath: ""
   testPath: ""
 kafka:
-  topic1: test1
-  topic2: test2
-  finishMsg: finish
+  topic1: ""
+  topic2: ""
+  finishMsg: ""
 jwt:
-  token: helloWorld
-  issuer: may1145
+  token: ""
+  issuer: ""
 redis:
-  addr:  localhost
-  password:
-  db: 0
-  poolsize: 10
+  addr:  ""
+  password: ""
+  db: ""
+  poolsize: ""
 email:
-  account: 2928229132@qq.com
-  password: dgovuilfebztdeae
+  account: ""
+  password: ""
 mysql:
-  host: 127.0.0.1
-  port: 3306
-  database: yail_test
-  username: root
-  password: Cherry1145
-  charset: utf8mb3
+  host: ""
+  port: ""
+  database: ""
+  username: ""
+  password: ""
+  charset: ""
 user:
-  default: 123456
+  default: ""
