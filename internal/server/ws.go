@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
+	"log"
 	"net/http"
 )
 
@@ -49,6 +50,9 @@ func Ws(w http.ResponseWriter, rq *http.Request, clientID string, isStream bool)
 		return
 	}
 
+	// 向模型方发送ack消息
+	mq.WriteTopicAck(context.Background(), topicW)
+
 	// 启动读写进程
 	if isStream {
 		go read(clientID, topicR)
@@ -79,7 +83,11 @@ func read(clientID, topicR string) {
 			break
 		}
 
-		mq.WriteMsg(context.Background(), topicR, jsonD)
+		err = mq.WriteMsg(context.Background(), topicR, jsonD)
+		if err != nil {
+			log.Printf("[mqError] ==== err: %s", err.Error())
+			break
+		}
 	}
 }
 
@@ -97,6 +105,9 @@ func write(clientID, topicW string) {
 	for {
 		data := <-pip
 		if string(data) == finishMsg {
+			break
+		} else if string(data) == mq.TimeOut {
+			log.Printf("[mqError] ==== err: %s", mq.TimeOut)
 			break
 		}
 		err := conn.WriteMessage(websocket.TextMessage, data)

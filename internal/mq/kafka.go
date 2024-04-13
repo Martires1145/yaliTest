@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	reader *kafka.Reader
-	topic1 = viper.GetString("kafka.topic1")
-	topic2 = viper.GetString("kafka.topic2")
-	host   = viper.GetString("kafka.host")
+	reader  *kafka.Reader
+	topic1  = viper.GetString("kafka.topic1")
+	topic2  = viper.GetString("kafka.topic2")
+	host    = viper.GetString("kafka.host")
+	TimeOut = viper.GetString("kafka.TimeOut")
 )
 
 func WriteTopicID(ctx context.Context, topicR, topicW string) {
@@ -56,7 +57,7 @@ func WriteTopicID(ctx context.Context, topicR, topicW string) {
 func ReadTopicAck(ctx context.Context, topic string) bool {
 	reader = kafka.NewReader(kafka.ReaderConfig{
 		Brokers:          []string{host},
-		Topic:            topic2,
+		Topic:            topic,
 		CommitInterval:   500 * time.Millisecond,
 		GroupID:          "rec_team",
 		StartOffset:      kafka.LastOffset,
@@ -69,14 +70,43 @@ func ReadTopicAck(ctx context.Context, topic string) bool {
 		fmt.Printf("读kafka失败:%v\n", err)
 		return false
 	} else {
-		if string(message.Value) == "ack" {
+		if string(message.Value) == "ACK" {
 			return true
 		}
 	}
 	return false
 }
 
-func WriteMsg(ctx context.Context, topic string, msg []byte) {
+func WriteTopicAck(ctx context.Context, topic string) {
+	writer := &kafka.Writer{
+		Addr:                   kafka.TCP(host),
+		Topic:                  topic,
+		Balancer:               &kafka.Hash{},
+		WriteTimeout:           1 * time.Second,
+		RequiredAcks:           kafka.RequireNone,
+		Async:                  true,
+		AllowAutoTopicCreation: true,
+		BatchSize:              1,
+	}
+	defer writer.Close()
+	for i := 0; i < 3; i++ {
+		if err := writer.WriteMessages(
+			ctx,
+			kafka.Message{Key: []byte("1145"), Value: []byte("ACK")},
+		); err != nil {
+			if err == kafka.LeaderNotAvailable {
+				time.Sleep(500 * time.Millisecond)
+				continue
+			} else {
+				fmt.Printf("写入失败:%v\n", err)
+			}
+		} else {
+			fmt.Printf("写入完成")
+		}
+	}
+}
+
+func WriteMsg(ctx context.Context, topic string, msg []byte) error {
 	writer := &kafka.Writer{
 		Addr:                   kafka.TCP(host),
 		Topic:                  topic,
@@ -99,11 +129,13 @@ func WriteMsg(ctx context.Context, topic string, msg []byte) {
 				continue
 			} else {
 				fmt.Printf("写入失败:%v\n", err)
+				return err
 			}
 		} else {
 			fmt.Printf("写入完成")
 		}
 	}
+	return nil
 }
 
 func ReadMsg(ctx context.Context, topic string, channel *chan []byte) {

@@ -17,6 +17,7 @@ kafka:
   topic2: test1
   finishMsg: finish
   host: 124.222.126.172:9092
+  timeOut: time out
 jwt:
   token: helloWorld
   issuer: may1145
