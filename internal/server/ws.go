@@ -4,6 +4,7 @@ import (
 	"cmdTest/internal/dto/model"
 	"cmdTest/internal/mq"
 	"cmdTest/internal/response"
+	"cmdTest/pkg/util"
 	"context"
 	"fmt"
 	"github.com/gorilla/websocket"
@@ -38,14 +39,24 @@ func Ws(w http.ResponseWriter, rq *http.Request, clientID string, isStream bool)
 	// 将生成的连接加入全局连接字典中
 	Conns[clientID] = conn
 
+	// 向模型提交用于交互的topic
+	topicR, topicW := util.GetTopic()
+	mq.WriteTopicID(context.Background(), topicR, topicW)
+
+	// 接受模型方的ack信息
+	if !mq.ReadTopicAck(context.Background(), topicR) {
+		response.Fail(w, "no ack", http.StatusInternalServerError)
+		return
+	}
+
 	// 启动读写进程
 	if isStream {
-		go read(clientID)
+		go read(clientID, topicR)
 	}
-	go write(clientID)
+	go write(clientID, topicW)
 }
 
-func read(clientID string) {
+func read(clientID, topicR string) {
 	conn := Conns[clientID]
 
 	defer func() {
@@ -68,11 +79,11 @@ func read(clientID string) {
 			break
 		}
 
-		mq.WriteMsg(context.Background(), jsonD)
+		mq.WriteMsg(context.Background(), topicR, jsonD)
 	}
 }
 
-func write(clientID string) {
+func write(clientID, topicW string) {
 	conn := Conns[clientID]
 	pip := make(chan []byte, 3)
 
@@ -81,7 +92,7 @@ func write(clientID string) {
 		delete(Conns, clientID)
 	}()
 
-	go mq.ReadMsg(context.Background(), &pip)
+	go mq.ReadMsg(context.Background(), topicW, &pip)
 
 	for {
 		data := <-pip

@@ -153,3 +153,7 @@ func GetUID() uint {
 	uid, _ := strconv.Atoi(GetClientID())
 	return uint(uid)
 }
+
+func GetTopic() (topic1 string, topic2 string) {
+	return GetClientID(), GetClientID()
+}
