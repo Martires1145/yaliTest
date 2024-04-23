@@ -224,6 +224,26 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/md/new": {
+            "post": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "新增模型参数",
+                "parameters": [
+                    {
+                        "description": "模型信息",
+                        "name": "md",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.JsonModel"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/path": {
             "get": {
                 "consumes": [
@@ -620,6 +640,29 @@ const docTemplate = `{
                 }
             }
         },
+        "model.JsonModel": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "integer"
+                },
+                "fileCnt": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "$ref": "#/definitions/model.ParamsJson"
+                },
+                "useCnt": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Params": {
             "type": "object",
             "properties": {
@@ -792,6 +835,207 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "w_lin": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ParamsExtra": {
+            "type": "object",
+            "properties": {
+                "activation": {
+                    "type": "string"
+                },
+                "anomaly_ratio": {
+                    "type": "string"
+                },
+                "batch_size": {
+                    "type": "string"
+                },
+                "checkpoints": {
+                    "type": "string"
+                },
+                "d_ff": {
+                    "type": "string"
+                },
+                "d_model": {
+                    "type": "string"
+                },
+                "devices": {
+                    "type": "string"
+                },
+                "distil": {
+                    "type": "string"
+                },
+                "dropout": {
+                    "type": "string"
+                },
+                "embed": {
+                    "type": "string"
+                },
+                "freq": {
+                    "type": "string"
+                },
+                "gpu": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "learning_rate": {
+                    "type": "string"
+                },
+                "loss": {
+                    "type": "string"
+                },
+                "lradj": {
+                    "type": "string"
+                },
+                "mask_rate": {
+                    "type": "string"
+                },
+                "moving_avg": {
+                    "type": "string"
+                },
+                "n_heads": {
+                    "type": "string"
+                },
+                "num_kernels": {
+                    "type": "string"
+                },
+                "num_workers": {
+                    "type": "string"
+                },
+                "output_attention": {
+                    "type": "string"
+                },
+                "p_hidden_dims": {
+                    "type": "string"
+                },
+                "p_hidden_layers": {
+                    "type": "string"
+                },
+                "patience": {
+                    "type": "string"
+                },
+                "seasonal_patterns": {
+                    "type": "string"
+                },
+                "top_k": {
+                    "type": "string"
+                },
+                "train_epochs": {
+                    "type": "string"
+                },
+                "use_amp": {
+                    "type": "string"
+                },
+                "use_gpu": {
+                    "type": "string"
+                },
+                "use_multi_gpu": {
+                    "type": "string"
+                },
+                "w_lin": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ParamsJson": {
+            "type": "object",
+            "properties": {
+                "pe": {
+                    "$ref": "#/definitions/model.ParamsExtra"
+                },
+                "pu": {
+                    "$ref": "#/definitions/model.ParamsUsual"
+                },
+                "useExtra": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.ParamsUsual": {
+            "type": "object",
+            "properties": {
+                "c_out": {
+                    "type": "string"
+                },
+                "d_layers": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "data_path": {
+                    "type": "string"
+                },
+                "data_test_path": {
+                    "type": "string"
+                },
+                "data_train_path": {
+                    "type": "string"
+                },
+                "data_vali_path": {
+                    "type": "string"
+                },
+                "dec_in": {
+                    "type": "string"
+                },
+                "des": {
+                    "type": "string"
+                },
+                "e_layers": {
+                    "type": "string"
+                },
+                "enc_in": {
+                    "type": "string"
+                },
+                "factor": {
+                    "type": "string"
+                },
+                "features": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_training": {
+                    "type": "string"
+                },
+                "itr": {
+                    "type": "string"
+                },
+                "label_len": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "model_id": {
+                    "type": "string"
+                },
+                "optim": {
+                    "type": "string"
+                },
+                "pred_len": {
+                    "type": "string"
+                },
+                "root_path": {
+                    "type": "string"
+                },
+                "scale": {
+                    "type": "string"
+                },
+                "seq_len": {
+                    "type": "string"
+                },
+                "target": {
+                    "type": "string"
+                },
+                "task_name": {
+                    "type": "string"
+                },
+                "use_kafka": {
                     "type": "string"
                 }
             }

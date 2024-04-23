@@ -53,5 +53,10 @@ func GetGin() *gin.Engine {
 		engineering.GET("/all", api.GetBriefEngineeringInfos)
 		engineering.GET("/:id", api.GetEngineeringInfo)
 	}
+
+	model := r.Group("/api/v1/md")
+	{
+		model.POST("/new", api.NewModel)
+	}
 	return r
 }
