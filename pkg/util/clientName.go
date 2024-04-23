@@ -155,5 +155,8 @@ func GetUID() uint {
 }
 
 func GetTopic() (topic1 string, topic2 string) {
-	return GetClientID(), GetClientID()
+	topic1 = GetClientID()
+	time.Sleep(time.Millisecond)
+	topic2 = GetClientID()
+	return
 }
