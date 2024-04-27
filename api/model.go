@@ -53,7 +53,7 @@ func ModifyModel(c *gin.Context) {
 	context.TODO()
 }
 
-func UserModel(c *gin.Context) {
+func UseModel(c *gin.Context) {
 	context.TODO()
 }
 

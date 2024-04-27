@@ -14,6 +14,10 @@ type Data struct {
 	Press         string `json:"press"`
 }
 
+type HistoryData struct {
+	ID uint `json:"ID"`
+}
+
 func (d *Data) Json() ([]byte, error) {
 	bytes, err := json.Marshal(d)
 	return bytes, err
