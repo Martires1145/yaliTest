@@ -94,3 +94,42 @@ func (m *ModelDaoMysql) NewModel(modelData *model.JsonModel, ParamsID int64) err
 
 	return err
 }
+
+func (m *ModelDaoMysql) DeleteModel(id string) error {
+	tx, err := db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err := tx.Commit()
+			if err != nil {
+				_ = tx.Rollback()
+				panic(err.Error())
+			}
+		}
+	}()
+
+	sqlStr := `DELETE FROM params_extra
+			   WHERE id = (SELECT params_id FROM models WHERE models.id = ?)`
+	_, err = tx.Exec(sqlStr, id)
+	if err != nil {
+		return err
+	}
+
+	sqlStr = `DELETE FROM params_usually
+			  WHERE id = (SELECT params_id FROM models WHERE models.id = ?)`
+	_, err = tx.Exec(sqlStr, id)
+	if err != nil {
+		return err
+	}
+
+	sqlStr = `DELETE FROM models WHERE id = ?`
+	_, err = tx.Exec(sqlStr, id)
+	return err
+}

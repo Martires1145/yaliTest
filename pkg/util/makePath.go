@@ -1,15 +1,13 @@
 package util
 
 import (
+	"context"
 	"fmt"
-	"time"
 )
 
 func MakePath(file string, fileType string) string {
-	now := toString(time.Now().Unix())
-	path := getPath(fileType)
-	path = path + now + file
-	return path
+	context.TODO()
+	return ""
 }
 
 func toString(now int64) string {

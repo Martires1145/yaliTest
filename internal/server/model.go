@@ -18,3 +18,8 @@ func NewModel(modelData *model.JsonModel) error {
 	err = modelDaoMysql.NewModel(modelData, id)
 	return err
 }
+
+func DeleteModel(id string) error {
+	err := modelDaoMysql.DeleteModel(id)
+	return err
+}

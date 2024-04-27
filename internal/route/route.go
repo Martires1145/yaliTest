@@ -57,6 +57,7 @@ func GetGin() *gin.Engine {
 	model := r.Group("/api/v1/md")
 	{
 		model.POST("/new", api.NewModel)
+		model.POST("/delete", api.DeleteModel)
 	}
 	return r
 }
