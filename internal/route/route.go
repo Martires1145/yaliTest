@@ -58,6 +58,10 @@ func GetGin() *gin.Engine {
 	{
 		model.POST("/new", api.NewModel)
 		model.POST("/delete", api.DeleteModel)
+		model.POST("/revise", api.ModifyModel)
+		model.POST("/copy", api.CopyModel)
+		model.GET("/all", api.GetModel)
+		model.GET("/params", api.GetModelParams)
 	}
 	return r
 }

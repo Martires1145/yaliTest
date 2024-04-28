@@ -108,7 +108,6 @@ type ParamsUsual struct {
 	ID            int64  `json:"id" db:"id"`
 	TaskName      string `json:"task_name" db:"task_name"`
 	IsTraining    string `json:"is_training" db:"is_training"`
-	ModelID       string `json:"model_id" db:"model_id"`
 	Model         string `json:"model" db:"model"`
 	Data          string `json:"data" db:"data"`
 	RootPath      string `json:"root_path" db:"root_path"`
@@ -135,9 +134,9 @@ type ParamsUsual struct {
 }
 
 type ParamsJson struct {
-	PE       ParamsExtra `json:"pe"`
-	PU       ParamsUsual `json:"pu"`
-	UseExtra bool        `json:"useExtra,omitempty"`
+	PE       *ParamsExtra `json:"pe"`
+	PU       *ParamsUsual `json:"pu"`
+	UseExtra bool         `json:"useExtra,omitempty"`
 }
 
 type stateModel struct {
@@ -154,7 +153,7 @@ type DBModel struct {
 	ID         uint   `db:"id"`
 	Name       string `db:"name"`
 	UseCnt     int    `db:"use_cnt"`
-	FileCnt    int    `db:"file_cnt"`
+	UseExtra   int    `db:"use_extra"`
 	CreateTime int64  `db:"create_time"`
 	State      int    `db:"state"`
 	ParamsID   int    `db:"params_id"`
@@ -164,7 +163,6 @@ type JsonModel struct {
 	ID         uint        `json:"ID"`
 	Name       string      `json:"name"`
 	UseCnt     int         `json:"useCnt"`
-	FileCnt    int         `json:"fileCnt"`
 	CreateTime int64       `json:"createTime"`
 	Params     *ParamsJson `json:"params"`
 }
@@ -197,4 +195,11 @@ func (p *Params) IsStream() bool {
 
 func (j *JsonModel) SetTime() {
 	j.CreateTime = time.Now().Unix()
+}
+
+func (p *ParamsJson) SetUseExtra() {
+	if p.PE == nil {
+		p.UseExtra = true
+	}
+	p.UseExtra = false
 }

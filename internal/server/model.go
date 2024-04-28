@@ -15,11 +15,31 @@ func NewModel(modelData *model.JsonModel) error {
 		return err
 	}
 
-	err = modelDaoMysql.NewModel(modelData, id)
-	return err
+	return modelDaoMysql.NewModel(modelData, id)
 }
 
 func DeleteModel(id string) error {
-	err := modelDaoMysql.DeleteModel(id)
-	return err
+	return modelDaoMysql.DeleteModel(id)
+}
+
+func ModifyModel(id, name, useKafka string) error {
+	return modelDaoMysql.ModifyModel(id, name, useKafka)
+}
+
+func CopyModel(id, name string) error {
+	return modelDaoMysql.CopyModel(id, name)
+}
+
+func GetAllModel() ([]model.DBModel, error) {
+	return modelDaoMysql.GetAllModel()
+}
+
+func GetModelParams(id string) (*model.ParamsJson, error) {
+	params, err := modelDaoMysql.GetModelParams(id)
+	if err != nil {
+		return nil, err
+	}
+
+	params.SetUseExtra()
+	return params, nil
 }

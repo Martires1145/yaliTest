@@ -37,7 +37,7 @@ func CsvUpload(c *gin.Context) {
 //	@Tags		文件模块
 //	@Summary	新建数据集文件夹
 //	@Produce	application/json
-//	@Param		filePath	fromData		string	true	"文件路径"
+//	@Param		filePath	formData	string	true	"文件路径"
 //	@Success	200			{object}	response.Response
 //	@Router		/api/v1/upload/new [post]
 func NewFilePath(c *gin.Context) {

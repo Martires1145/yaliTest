@@ -23,8 +23,8 @@ func (d *Data) Json() ([]byte, error) {
 	return bytes, err
 }
 
-func MakeData(list []string) Data {
-	return Data{
+func MakeData(list []string) *Data {
+	return &Data{
 		Date:          list[0],
 		YaliStage:     list[1],
 		Stage:         list[2],

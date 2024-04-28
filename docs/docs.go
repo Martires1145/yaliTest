@@ -224,12 +224,64 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/md/all": {
+            "get": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "获取所有模型信息",
+                "responses": {}
+            }
+        },
+        "/api/v1/md/copy": {
+            "post": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "复制模型",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelID",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "新模型名称",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/md/delete": {
+            "post": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "删除模型",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型信息",
+                        "name": "modelID",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/md/new": {
             "post": {
                 "tags": [
                     "Model"
                 ],
-                "summary": "新增模型参数",
+                "summary": "新增模型",
                 "parameters": [
                     {
                         "description": "模型信息",
@@ -244,6 +296,65 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/md/params": {
+            "get": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "获取模型参数",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelID",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/md/revise": {
+            "post": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "修改模型",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelID",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "模型新名称",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "模型use-kafka按钮",
+                        "name": "useKafka",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/md/use": {
+            "post": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "使用模型",
+                "responses": {}
+            }
+        },
         "/api/v1/path": {
             "get": {
                 "consumes": [
@@ -253,14 +364,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件选项模块"
+                    "文件模块"
                 ],
-                "summary": "查看对应类别的路径下有哪些文件",
+                "summary": "查看对应路径下有哪些文件",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "文件类型",
-                        "name": "file_type",
+                        "description": "文件路径",
+                        "name": "filePath",
                         "in": "query",
                         "required": true
                     }
@@ -314,9 +425,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "上传模块"
+                    "文件模块"
                 ],
-                "summary": "上传对应类型的csv文件到对应路径",
+                "summary": "上传数据集文件到对应路径",
                 "parameters": [
                     {
                         "type": "file",
@@ -327,9 +438,37 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "文件类型",
-                        "name": "file_type",
+                        "description": "文件路径",
+                        "name": "filePath",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/upload/new": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件模块"
+                ],
+                "summary": "新建数据集文件夹",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "文件路径",
+                        "name": "filePath",
+                        "in": "formData",
                         "required": true
                     }
                 ],
@@ -647,9 +786,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "createTime": {
-                    "type": "integer"
-                },
-                "fileCnt": {
                     "type": "integer"
                 },
                 "name": {
@@ -1009,9 +1145,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "model": {
-                    "type": "string"
-                },
-                "model_id": {
                     "type": "string"
                 },
                 "optim": {

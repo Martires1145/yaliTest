@@ -47,8 +47,6 @@ definitions:
         type: integer
       createTime:
         type: integer
-      fileCnt:
-        type: integer
       name:
         type: string
       params:
@@ -287,8 +285,6 @@ definitions:
         type: string
       model:
         type: string
-      model_id:
-        type: string
       optim:
         type: string
       pred_len:
@@ -497,6 +493,41 @@ paths:
       summary: 修改施工信息
       tags:
       - Engineering
+  /api/v1/md/all:
+    get:
+      responses: {}
+      summary: 获取所有模型信息
+      tags:
+      - Model
+  /api/v1/md/copy:
+    post:
+      parameters:
+      - description: 模型ID
+        in: formData
+        name: modelID
+        required: true
+        type: string
+      - description: 新模型名称
+        in: formData
+        name: name
+        required: true
+        type: string
+      responses: {}
+      summary: 复制模型
+      tags:
+      - Model
+  /api/v1/md/delete:
+    post:
+      parameters:
+      - description: 模型信息
+        in: formData
+        name: modelID
+        required: true
+        type: string
+      responses: {}
+      summary: 删除模型
+      tags:
+      - Model
   /api/v1/md/new:
     post:
       parameters:
@@ -507,7 +538,47 @@ paths:
         schema:
           $ref: '#/definitions/model.JsonModel'
       responses: {}
-      summary: 新增模型参数
+      summary: 新增模型
+      tags:
+      - Model
+  /api/v1/md/params:
+    get:
+      parameters:
+      - description: 模型ID
+        in: formData
+        name: modelID
+        required: true
+        type: string
+      responses: {}
+      summary: 获取模型参数
+      tags:
+      - Model
+  /api/v1/md/revise:
+    post:
+      parameters:
+      - description: 模型ID
+        in: formData
+        name: modelID
+        required: true
+        type: string
+      - description: 模型新名称
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: 模型use-kafka按钮
+        in: formData
+        name: useKafka
+        required: true
+        type: integer
+      responses: {}
+      summary: 修改模型
+      tags:
+      - Model
+  /api/v1/md/use:
+    post:
+      responses: {}
+      summary: 使用模型
       tags:
       - Model
   /api/v1/path:
@@ -515,9 +586,9 @@ paths:
       consumes:
       - multipart/form-data
       parameters:
-      - description: 文件类型
+      - description: 文件路径
         in: query
-        name: file_type
+        name: filePath
         required: true
         type: string
       produces:
@@ -527,9 +598,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: 查看对应类别的路径下有哪些文件
+      summary: 查看对应路径下有哪些文件
       tags:
-      - 文件选项模块
+      - 文件模块
   /api/v1/rs:
     post:
       parameters:
@@ -559,9 +630,9 @@ paths:
         name: file
         required: true
         type: file
-      - description: 文件类型
+      - description: 文件路径
         in: query
-        name: file_type
+        name: filePath
         required: true
         type: string
       produces:
@@ -571,9 +642,27 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: 上传对应类型的csv文件到对应路径
+      summary: 上传数据集文件到对应路径
       tags:
-      - 上传模块
+      - 文件模块
+  /api/v1/upload/new:
+    post:
+      parameters:
+      - description: 文件路径
+        in: formData
+        name: filePath
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 新建数据集文件夹
+      tags:
+      - 文件模块
   /api/v1/user/all:
     get:
       responses: {}

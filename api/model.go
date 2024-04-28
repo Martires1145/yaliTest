@@ -4,7 +4,6 @@ import (
 	"cmdTest/internal/dto/model"
 	"cmdTest/internal/response"
 	"cmdTest/internal/server"
-	"context"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,21 +45,92 @@ func DeleteModel(c *gin.Context) {
 		response.Fail(c.Writer, err.Error(), 500)
 	}
 
-	response.Success(c.Writer, "success", 200)
+	response.Success(c.Writer, "success", nil)
 }
 
+// ModifyModel
+//
+//	@Summary	修改模型
+//	@Tags		Model
+//	@Param		modelID		formData	string	true	"模型ID"
+//	@Param		name		formData	string	true	"模型新名称"
+//	@Param		useKafka	formData	int		true	"模型use-kafka按钮"
+//	@Router		/api/v1/md/revise [post]
 func ModifyModel(c *gin.Context) {
-	context.TODO()
+	id := c.PostForm("modelID")
+	name := c.PostForm("name")
+	useKafka := c.PostForm("useKafka")
+
+	err := server.ModifyModel(id, name, useKafka)
+
+	if err != nil {
+		response.Fail(c.Writer, err.Error(), 500)
+	}
+
+	response.Success(c.Writer, "success", nil)
 }
 
+// UseModel
+//
+//	@Summary	使用模型
+//	@Tags		Model
+//	@Router		/api/v1/md/use [post]
 func UseModel(c *gin.Context) {
-	context.TODO()
+	// todo
+	panic("todo")
 }
 
+// CopyModel
+//
+//	@Summary	复制模型
+//	@Tags		Model
+//	@Param		modelID	formData	string	true	"模型ID"
+//	@Param		name	formData	string	true	"新模型名称"
+//	@Router		/api/v1/md/copy [post]
 func CopyModel(c *gin.Context) {
-	context.TODO()
+	id := c.PostForm("modelID")
+	name := c.PostForm("name")
+
+	err := server.CopyModel(id, name)
+	if err != nil {
+		response.Fail(c.Writer, err.Error(), 500)
+	}
+
+	response.Success(c.Writer, "success", nil)
 }
 
+// GetModel
+//
+//	@Summary	获取所有模型信息
+//	@Tags		Model
+//	@Router		/api/v1/md/all [get]
 func GetModel(c *gin.Context) {
-	context.TODO()
+	models, err := server.GetAllModel()
+	if err != nil {
+		response.Fail(c.Writer, err.Error(), 500)
+	}
+
+	response.Success(c.Writer, "success", models)
+}
+
+func UploadModelFile(c *gin.Context) {
+	// todo
+	panic("todo")
+}
+
+// GetModelParams
+//
+//	@Summary	获取模型参数
+//	@Tags		Model
+//	@Param		modelID	formData	string	true	"模型ID"
+//	@Router		/api/v1/md/params [get]
+func GetModelParams(c *gin.Context) {
+	id := c.PostForm("modelID")
+
+	params, err := server.GetModelParams(id)
+	if err != nil {
+		response.Fail(c.Writer, err.Error(), 500)
+	}
+
+	response.Success(c.Writer, "success", params)
 }
