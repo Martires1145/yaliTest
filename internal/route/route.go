@@ -17,7 +17,6 @@ func GetGin() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.POST("/api/v1/rs", api.RunScript)
-	r.POST("/api/v1/upload/csv", limits.RequestSizeLimiter(2<<20), api.CsvUpload)
 	r.GET("/api/v1/path", api.File)
 	r.GET("/api/v1/dchan", api.DataChan)
 
@@ -62,6 +61,16 @@ func GetGin() *gin.Engine {
 		model.POST("/copy", api.CopyModel)
 		model.GET("/all", api.GetModel)
 		model.GET("/params", api.GetModelParams)
+	}
+
+	file := r.Group("/api/v1/file")
+	{
+		file.POST("/new", api.NewFilePath)
+		file.POST("/dp", api.DeletePath)
+		file.POST("/df", api.DeleteFile)
+		file.POST("/csv", limits.RequestSizeLimiter(2<<20), api.CsvUpload)
+		file.GET("/all", api.GetAllPath)
+		file.GET("/", api.File)
 	}
 	return r
 }

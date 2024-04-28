@@ -7,11 +7,6 @@ script:
   successMsg: 启动成功
 model:
   path: ""
-  rootPath: ""
-  dataPath: ""
-  trainPath: ""
-  valiPath: ""
-  testPath: ""
 kafka:
   topic1: test1
   topic2: test1
