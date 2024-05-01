@@ -384,6 +384,36 @@ paths:
       summary: 登录
       tags:
       - User
+  /api/v1/data/all:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 查看所有历史数据
+      tags:
+      - 历史数据模块
+  /api/v1/data/delete:
+    post:
+      parameters:
+      - description: 使用模型时产生的历史数据id
+        in: formData
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 关闭查看历史数据进程
+      tags:
+      - 历史数据模块
   /api/v1/dchan:
     get:
       parameters:
@@ -493,6 +523,147 @@ paths:
       summary: 修改施工信息
       tags:
       - Engineering
+  /api/v1/file/:
+    get:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 文件路径
+        in: query
+        name: filePath
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 查看对应路径下有哪些文件
+      tags:
+      - 文件模块
+  /api/v1/file/all:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取所有数据文件夹
+      tags:
+      - 文件模块
+  /api/v1/file/csv:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: csv文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 文件路径
+        in: formData
+        name: filePath
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 上传数据集文件到对应路径
+      tags:
+      - 文件模块
+  /api/v1/file/df:
+    post:
+      parameters:
+      - description: 文件路径
+        in: formData
+        name: filePath
+        required: true
+        type: string
+      - description: 文件名称
+        in: formData
+        name: fileName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除数据文件
+      tags:
+      - 文件模块
+  /api/v1/file/dp:
+    post:
+      parameters:
+      - description: 文件路径
+        in: formData
+        name: filePath
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除数据文件夹
+      tags:
+      - 文件模块
+  /api/v1/file/new:
+    post:
+      parameters:
+      - description: 文件路径
+        in: formData
+        name: filePath
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 新建数据集文件夹
+      tags:
+      - 文件模块
+  /api/v1/history/uf:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 预测数据文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 使用模型时产生的历史数据id
+        in: formData
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 上传数据集文件到对应路径
+      tags:
+      - 历史数据模块
   /api/v1/md/all:
     get:
       responses: {}
@@ -581,26 +752,6 @@ paths:
       summary: 使用模型
       tags:
       - Model
-  /api/v1/path:
-    get:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: 文件路径
-        in: query
-        name: filePath
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: 查看对应路径下有哪些文件
-      tags:
-      - 文件模块
   /api/v1/rs:
     post:
       parameters:
@@ -620,49 +771,6 @@ paths:
       summary: 运行脚本
       tags:
       - 脚本模块
-  /api/v1/upload/csv:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: csv文件
-        in: formData
-        name: file
-        required: true
-        type: file
-      - description: 文件路径
-        in: query
-        name: filePath
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: 上传数据集文件到对应路径
-      tags:
-      - 文件模块
-  /api/v1/upload/new:
-    post:
-      parameters:
-      - description: 文件路径
-        in: formData
-        name: filePath
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: 新建数据集文件夹
-      tags:
-      - 文件模块
   /api/v1/user/all:
     get:
       responses: {}

@@ -72,5 +72,15 @@ func GetGin() *gin.Engine {
 		file.GET("/all", api.GetAllPath)
 		file.GET("/", api.File)
 	}
+
+	history := r.Group("/api/v1/history")
+	{
+		history.POST("/uf", api.NewForecastData)
+		history.POST("/delete", api.DeleteHistoryData)
+		history.POST("/do", api.DataDetailOpen)
+		history.POST("/dc", api.DataDetailClose)
+		history.GET("/all", api.GetHistoryData)
+		history.GET("/range", api.GetDataDetailRanged)
+	}
 	return r
 }

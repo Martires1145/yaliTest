@@ -32,7 +32,7 @@ func File(c *gin.Context) {
 //	@Accept		multipart/form-data
 //	@Produce	application/json
 //	@Param		file		formData	file	true	"csv文件"
-//	@Param		filePath	formData		string	true	"文件路径"
+//	@Param		filePath	formData	string	true	"文件路径"
 //	@Success	200			{object}	response.Response
 //	@Router		/api/v1/file/csv [post]
 func CsvUpload(c *gin.Context) {
@@ -75,7 +75,7 @@ func NewFilePath(c *gin.Context) {
 //	@Tags		文件模块
 //	@Summary	获取所有数据文件夹
 //	@Produce	application/json
-//	@Success	200			{object}	response.Response
+//	@Success	200	{object}	response.Response
 //	@Router		/api/v1/file/all [get]
 func GetAllPath(c *gin.Context) {
 	paths, err := server.GetAllPath()
@@ -91,7 +91,7 @@ func GetAllPath(c *gin.Context) {
 //	@Tags		文件模块
 //	@Summary	删除数据文件夹
 //	@Produce	application/json
-//	@Param		filePath	formData		string	true	"文件路径"
+//	@Param		filePath	formData	string	true	"文件路径"
 //	@Success	200			{object}	response.Response
 //	@Router		/api/v1/file/dp [post]
 func DeletePath(c *gin.Context) {
@@ -110,8 +110,8 @@ func DeletePath(c *gin.Context) {
 //	@Tags		文件模块
 //	@Summary	删除数据文件
 //	@Produce	application/json
-//	@Param		filePath	formData		string	true	"文件路径"
-//	@Param		fileName	formData		string	true	"文件名称"
+//	@Param		filePath	formData	string	true	"文件路径"
+//	@Param		fileName	formData	string	true	"文件名称"
 //	@Success	200			{object}	response.Response
 //	@Router		/api/v1/file/df [post]
 func DeleteFile(c *gin.Context) {

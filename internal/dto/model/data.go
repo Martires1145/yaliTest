@@ -14,8 +14,29 @@ type Data struct {
 	Press         string `json:"press"`
 }
 
-type HistoryData struct {
-	ID uint `json:"ID"`
+type DataHistory struct {
+	ID            uint   `json:"ID" db:"id"`
+	ModelID       uint   `json:"modelID" db:"model_id"`
+	WellID        uint   `json:"wellID" db:"well_id"`
+	EngineeringID uint   `json:"engineeringID" db:"engineering_id"`
+	CreateTime    int64  `json:"createTime" db:"create_time"`
+	TrueDataPath  string `json:"trueDataPath" db:"true_data_path"`
+	PDataPath     string `json:"pDataPath" db:"p_data_path"`
+}
+
+type DataHistoryJson struct {
+	ID            uint  `json:"ID" db:"id"`
+	ModelID       uint  `json:"modelID" db:"model_id"`
+	WellID        uint  `json:"wellID" db:"well_id"`
+	EngineeringID uint  `json:"engineeringID" db:"engineering_id"`
+	CreateTime    int64 `json:"createTime" db:"create_time"`
+}
+
+type RangeData struct {
+	Max  int    `json:"maxYali"`
+	Min  int    `json:"min"`
+	Mean int    `json:"mean"`
+	Data []Data `json:"data"`
 }
 
 func (d *Data) Json() ([]byte, error) {
