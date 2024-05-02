@@ -1,17 +1,20 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strconv"
+)
 
 type Data struct {
-	Date          string `json:"date"`
-	YaliStage     string `json:"yali_stage"`
-	Stage         string `json:"stage"`
-	Taoya         string `json:"taoya"`
-	Paichu        string `json:"paichu"`
-	JieduanPaichu string `json:"jieduan_paichu"`
-	Paichu1       string `json:"paichu_1"`
-	Shanongdu     string `json:"shanongdu"`
-	Press         string `json:"press"`
+	Date          string `json:"date" csv:"date"`
+	YaliStage     string `json:"yali_stage" csv:"yali_stage"`
+	Stage         string `json:"stage" csv:"stage"`
+	Taoya         string `json:"taoya" csv:"taoya"`
+	Paichu        string `json:"paichu" csv:"paichu"`
+	JieduanPaichu string `json:"jieduan_paichu" csv:"jieduan_paichu"`
+	Paichu1       string `json:"paichu_1" csv:"paichu_1"`
+	Shanongdu     string `json:"shanongdu" csv:"shanongdu"`
+	Press         string `json:"press" csv:"press"`
 }
 
 type DataHistory struct {
@@ -56,4 +59,11 @@ func MakeData(list []string) *Data {
 		Shanongdu:     list[7],
 		Press:         list[8],
 	}
+}
+
+func (d *Data) ParseTime() int64 {
+	// todo
+	t, _ := strconv.Atoi(d.Date)
+	return int64(t)
+
 }

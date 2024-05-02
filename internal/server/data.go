@@ -3,14 +3,17 @@ package server
 import (
 	"cmdTest/internal/dto/model"
 	"cmdTest/internal/dto/mysql"
+	"cmdTest/internal/serror"
 	"cmdTest/pkg/util"
 	"fmt"
+	"github.com/gocarina/gocsv"
 	"mime/multipart"
+	"os"
 	"strconv"
 	"sync"
 )
 
-type InFunction func(int, int) (*model.RangeData, error)
+type InFunction func(int64, int64) (*model.RangeData, error)
 type CloseFunction func() error
 type useCnt struct {
 	cnt int
@@ -90,12 +93,12 @@ func DataDetailOpen(id string) error {
 }
 
 func DataDetailProcess(id string) (InFunction, CloseFunction) {
-	tp, pp := hMap[id].TrueDataPath, hMap[id].PDataPath
-	fromChan, toChan := make(chan int), make(chan int)
+	tp, pp := truePath+hMap[id].TrueDataPath, forecastPath+hMap[id].PDataPath
+	fromChan, toChan := make(chan int64), make(chan int64)
 	rangeDataChan, errorChan := make(chan *model.RangeData), make(chan error)
 	closeChan := make(chan int)
 
-	getInFunc := func() (from int, to int, c int) {
+	getInFunc := func() (from int64, to int64, c int) {
 		from = <-fromChan
 		to = <-toChan
 		c = <-closeChan
@@ -103,21 +106,42 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 	}
 
 	go func() {
-		_, _, err := getHistoryData(tp, pp)
+		td, pd, err := getHistoryData(tp, pp)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
+
+		ty, py, err := getHistoryYaliData(td, pd)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		tSum, pSum := getHistoryYaliSum(ty, py)
 		for {
-			_, _, c := getInFunc()
+			from, to, c := getInFunc()
 			if c == 1 {
 				break
 			}
-			rangeDataChan <- nil
+			fi, ti, err := getDataIndex(from, to, td)
+			if err != nil {
+				rangeDataChan <- nil
+				errorChan <- err
+				continue
+			}
+
+			rangeData, err := getRangeData(fi, ti, tSum, pSum)
+			if err != nil {
+				rangeDataChan <- nil
+				errorChan <- err
+				continue
+			}
+
+			rangeDataChan <- rangeData
 			errorChan <- nil
 		}
 	}()
 
-	return func(from int, to int) (*model.RangeData, error) {
+	return func(from int64, to int64) (*model.RangeData, error) {
 			fromChan <- from
 			toChan <- to
 			closeChan <- 0
@@ -138,9 +162,88 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 		}
 }
 
-func getHistoryData(t string, p string) ([]model.Data, []model.Data, error) {
+func getHistoryData(t string, p string) (td []model.Data, pd []model.Data, err error) {
+	openT, err := os.OpenFile(t, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer openT.Close()
+
+	openP, err := os.OpenFile(p, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer openP.Close()
+
+	err = gocsv.UnmarshalFile(openT, &td)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = gocsv.UnmarshalFile(openP, &pd)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return
+}
+
+func getRangeData(fi, ti int, tSum []float64, pSum []float64) (*model.RangeData, error) {
 	// todo
 	panic("todo")
+}
+
+func getHistoryYaliData(td, pd []model.Data) (ty []float64, py []float64, err error) {
+	for _, d := range td {
+		yaliString := d.Press
+		yaliFloat, err := strconv.ParseFloat(yaliString, 64)
+		if err != nil {
+			return nil, nil, err
+		}
+		ty = append(ty, yaliFloat)
+	}
+
+	for _, d := range pd {
+		yaliString := d.Press
+		yaliFloat, err := strconv.ParseFloat(yaliString, 64)
+		if err != nil {
+			return nil, nil, err
+		}
+		ty = append(py, yaliFloat)
+	}
+
+	return
+}
+
+func getHistoryYaliSum(ty, py []float64) (tSum []float64, pSum []float64) {
+	tSum = make([]float64, len(ty)+1)
+	pSum = make([]float64, len(py)+1)
+
+	for i := 1; i < len(tSum); i++ {
+		tSum[i] = tSum[i-1] + ty[i-1]
+	}
+
+	for i := 1; i < len(pSum); i++ {
+		pSum[i] = pSum[i-1] + py[i-1]
+	}
+
+	return
+}
+
+func getDataIndex(from, to int64, td []model.Data) (fi int, ti int, err error) {
+	for i := range td {
+		if td[i].ParseTime() == from {
+			fi = i
+		} else if td[i].ParseTime() == to {
+			ti = i
+		}
+	}
+
+	if fi <= ti {
+		return -1, -1, serror.WrongRangeError
+	}
+
+	return
 }
 
 func GetRangeData(id, from, to string) (*model.RangeData, error) {
@@ -149,7 +252,7 @@ func GetRangeData(id, from, to string) (*model.RangeData, error) {
 
 	inF := inMap[id]
 	mutex.Lock()
-	data, err := inF(f, t)
+	data, err := inF(int64(f), int64(t))
 	mutex.Unlock()
 	return data, err
 }
