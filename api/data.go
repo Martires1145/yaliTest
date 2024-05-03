@@ -103,7 +103,7 @@ func DataDetailOpen(c *gin.Context) {
 // GetDataDetailRanged
 //
 //	@Tags		历史数据模块
-//	@Summary	打开查看历史数据进程
+//	@Summary	获取范围历史数据
 //	@Produce	application/json
 //	@Param		id		formData	int	true	"使用模型时产生的历史数据id"
 //	@Param		from	formData	int	true	"起始时间"
