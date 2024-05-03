@@ -31,14 +31,27 @@ var (
 	mutex        = sync.Mutex{}
 )
 
-func NewForecastData(id string, file *multipart.FileHeader) error {
-	path := forecastPath + file.Filename
-	err := util.SaveFile(path, file)
+func NewHistoryData(fileTrue *multipart.FileHeader, filePredict *multipart.FileHeader, history *model.DataHistoryJson) error {
+	pPath := forecastPath + filePredict.Filename
+	err := util.SaveFile(pPath, filePredict)
 	if err != nil {
 		return err
 	}
 
-	return dataDaoMysql.SaveForecastDataHistory(id, file.Filename)
+	tPath := truePath + filePredict.Filename
+	err = util.SaveFile(tPath, fileTrue)
+	if err != nil {
+		return err
+	}
+
+	return dataDaoMysql.SaveDataHistory(&model.DataHistory{
+		ModelID:       history.ModelID,
+		WellID:        history.WellID,
+		EngineeringID: history.EngineeringID,
+		CreateTime:    history.CreateTime,
+		TrueDataPath:  fileTrue.Filename,
+		PDataPath:     filePredict.Filename,
+	})
 }
 
 func GetHistoryData() ([]model.DataHistoryJson, error) {

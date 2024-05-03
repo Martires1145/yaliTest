@@ -6,9 +6,12 @@ import (
 
 type DataDaoMysql struct{}
 
-func (d *DataDaoMysql) SaveForecastDataHistory(id string, trueDataPath string) error {
-	sqlStr := "UPDATE histories SET p_data_path = ? WHERE id = ?"
-	_, err := db.Exec(sqlStr, trueDataPath, id)
+func (d *DataDaoMysql) SaveDataHistory(history *model.DataHistory) error {
+	sqlStr := `INSERT INTO histories
+    (model_id, well_id, engineering_id, create_time, true_data_path, p_data_path) VALUE 
+    (:model_id, :well_id, :engineering_id, :create_time, :true_data_path, :p_data_path)`
+
+	_, err := db.NamedExec(sqlStr, history)
 	return err
 }
 

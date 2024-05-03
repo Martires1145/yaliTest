@@ -1,4 +1,17 @@
 definitions:
+  model.DataHistoryJson:
+    properties:
+      ID:
+        type: integer
+      createTime:
+        type: integer
+      engineeringID:
+        type: integer
+      modelID:
+        type: integer
+      wellID:
+        type: integer
+    type: object
   model.Device:
     properties:
       ID:
@@ -398,7 +411,7 @@ paths:
       summary: 查看所有历史数据
       tags:
       - 历史数据模块
-  /api/v1/data/delete:
+  /api/v1/data/dc:
     post:
       parameters:
       - description: 使用模型时产生的历史数据id
@@ -414,6 +427,70 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: 关闭查看历史数据进程
+      tags:
+      - 历史数据模块
+  /api/v1/data/delete:
+    post:
+      parameters:
+      - description: 使用模型时产生的历史数据id
+        in: formData
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除历史数据
+      tags:
+      - 历史数据模块
+  /api/v1/data/do:
+    post:
+      parameters:
+      - description: 使用模型时产生的历史数据id
+        in: formData
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 打开查看历史数据进程
+      tags:
+      - 历史数据模块
+  /api/v1/data/range:
+    post:
+      parameters:
+      - description: 使用模型时产生的历史数据id
+        in: formData
+        name: id
+        required: true
+        type: integer
+      - description: 起始时间
+        in: formData
+        name: from
+        required: true
+        type: integer
+      - description: 截止时间
+        in: formData
+        name: to
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 打开查看历史数据进程
       tags:
       - 历史数据模块
   /api/v1/dchan:
@@ -646,16 +723,22 @@ paths:
       consumes:
       - multipart/form-data
       parameters:
+      - description: 真实数据文件
+        in: formData
+        name: fileTrue
+        required: true
+        type: file
       - description: 预测数据文件
         in: formData
-        name: file
+        name: filePredict
         required: true
         type: file
       - description: 使用模型时产生的历史数据id
-        in: formData
-        name: id
+        in: body
+        name: history
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/model.DataHistoryJson'
       produces:
       - application/json
       responses:
@@ -663,7 +746,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: 上传数据集文件到对应路径
+      summary: 新建历史数据
       tags:
       - 历史数据模块
   /api/v1/md/all:

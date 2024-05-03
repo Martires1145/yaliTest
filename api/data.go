@@ -1,30 +1,44 @@
 package api
 
 import (
+	"cmdTest/internal/dto/model"
 	"cmdTest/internal/response"
 	"cmdTest/internal/server"
 	"github.com/gin-gonic/gin"
 )
 
-// NewForecastData
+// NewHistoryData
 //
 //	@Tags		历史数据模块
-//	@Summary	上传数据集文件到对应路径
+//	@Summary	新建历史数据
 //	@Accept		multipart/form-data
 //	@Produce	application/json
-//	@Param		file	formData	file	true	"预测数据文件"
-//	@Param		id		formData	int		true	"使用模型时产生的历史数据id"
-//	@Success	200		{object}	response.Response
+//	@Param		fileTrue	formData	file					true	"真实数据文件"
+//	@Param		filePredict	formData	file					true	"预测数据文件"
+//	@Param		history		body		model.DataHistoryJson	true	"使用模型时产生的历史数据id"
+//	@Success	200			{object}	response.Response
 //	@Router		/api/v1/history/uf [post]
-func NewForecastData(c *gin.Context) {
-	id := c.PostForm("id")
-	fileData, err := c.FormFile("file")
+func NewHistoryData(c *gin.Context) {
+	fileDataTrue, err := c.FormFile("fileTrue")
 	if err != nil {
 		response.Fail(c.Writer, "wrong file data", 400)
 		return
 	}
 
-	err = server.NewForecastData(id, fileData)
+	filePredict, err := c.FormFile("fileTrue")
+	if err != nil {
+		response.Fail(c.Writer, "wrong file data", 400)
+		return
+	}
+
+	var history model.DataHistoryJson
+	err = c.ShouldBindJSON(&history)
+	if err != nil {
+		response.Fail(c.Writer, "wrong data format", 400)
+		return
+	}
+
+	err = server.NewHistoryData(fileDataTrue, filePredict, &history)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
 	}
@@ -74,7 +88,7 @@ func DeleteHistoryData(c *gin.Context) {
 //	@Produce	application/json
 //	@Param		id	formData	int	true	"使用模型时产生的历史数据id"
 //	@Success	200	{object}	response.Response
-//	@Router		/api/v1/data/delete [post]
+//	@Router		/api/v1/data/do [post]
 func DataDetailOpen(c *gin.Context) {
 	id := c.PostForm("id")
 
@@ -95,7 +109,7 @@ func DataDetailOpen(c *gin.Context) {
 //	@Param		from	formData	int	true	"起始时间"
 //	@Param		to		formData	int	true	"截止时间"
 //	@Success	200		{object}	response.Response
-//	@Router		/api/v1/data/delete [post]
+//	@Router		/api/v1/data/range [post]
 func GetDataDetailRanged(c *gin.Context) {
 	id := c.PostForm("id")
 	from := c.PostForm("from")
@@ -119,7 +133,7 @@ func GetDataDetailRanged(c *gin.Context) {
 //	@Produce	application/json
 //	@Param		id	formData	int	true	"使用模型时产生的历史数据id"
 //	@Success	200	{object}	response.Response
-//	@Router		/api/v1/data/delete [post]
+//	@Router		/api/v1/data/dc [post]
 func DataDetailClose(c *gin.Context) {
 	id := c.PostForm("id")
 

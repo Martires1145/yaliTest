@@ -78,7 +78,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/data/delete": {
+        "/api/v1/data/dc": {
             "post": {
                 "produces": [
                     "application/json"
@@ -92,6 +92,104 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "使用模型时产生的历史数据id",
                         "name": "id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/delete": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "历史数据模块"
+                ],
+                "summary": "删除历史数据",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "使用模型时产生的历史数据id",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/do": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "历史数据模块"
+                ],
+                "summary": "打开查看历史数据进程",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "使用模型时产生的历史数据id",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/range": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "历史数据模块"
+                ],
+                "summary": "打开查看历史数据进程",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "使用模型时产生的历史数据id",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "起始时间",
+                        "name": "from",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "截止时间",
+                        "name": "to",
                         "in": "formData",
                         "required": true
                     }
@@ -461,21 +559,30 @@ const docTemplate = `{
                 "tags": [
                     "历史数据模块"
                 ],
-                "summary": "上传数据集文件到对应路径",
+                "summary": "新建历史数据",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "预测数据文件",
-                        "name": "file",
+                        "description": "真实数据文件",
+                        "name": "fileTrue",
                         "in": "formData",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "使用模型时产生的历史数据id",
-                        "name": "id",
+                        "type": "file",
+                        "description": "预测数据文件",
+                        "name": "filePredict",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "description": "使用模型时产生的历史数据id",
+                        "name": "history",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DataHistoryJson"
+                        }
                     }
                 ],
                 "responses": {
@@ -929,6 +1036,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.DataHistoryJson": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "createTime": {
+                    "type": "integer"
+                },
+                "engineeringID": {
+                    "type": "integer"
+                },
+                "modelID": {
+                    "type": "integer"
+                },
+                "wellID": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.Device": {
             "type": "object",
             "properties": {

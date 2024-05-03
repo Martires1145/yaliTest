@@ -77,7 +77,7 @@ func GetGin() *gin.Engine {
 
 	history := r.Group("/api/v1/history")
 	{
-		history.POST("/uf", api.NewForecastData)
+		history.POST("/new", api.NewHistoryData)
 		history.POST("/delete", api.DeleteHistoryData)
 		history.POST("/do", api.DataDetailOpen)
 		history.POST("/dc", api.DataDetailClose)
