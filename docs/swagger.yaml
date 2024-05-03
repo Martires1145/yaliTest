@@ -490,7 +490,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: 打开查看历史数据进程
+      summary: 获取范围历史数据
       tags:
       - 历史数据模块
   /api/v1/dchan:

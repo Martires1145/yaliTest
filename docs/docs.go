@@ -170,7 +170,7 @@ const docTemplate = `{
                 "tags": [
                     "历史数据模块"
                 ],
-                "summary": "打开查看历史数据进程",
+                "summary": "获取范围历史数据",
                 "parameters": [
                     {
                         "type": "integer",
