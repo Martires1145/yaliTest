@@ -108,6 +108,7 @@ type ParamsUsual struct {
 	ID            int64  `json:"id" db:"id"`
 	TaskName      string `json:"task_name" db:"task_name"`
 	IsTraining    string `json:"is_training" db:"is_training"`
+	ModelID       string `json:"model_id" db:"model_id"`
 	Model         string `json:"model" db:"model"`
 	Data          string `json:"data" db:"data"`
 	RootPath      string `json:"root_path" db:"root_path"`
@@ -139,16 +140,6 @@ type ParamsJson struct {
 	UseExtra bool         `json:"useExtra,omitempty"`
 }
 
-type stateModel struct {
-	Running int
-	Stop    int
-}
-
-var StateOfModel = stateModel{
-	Running: 1,
-	Stop:    0,
-}
-
 type DBModel struct {
 	ID         uint   `db:"id"`
 	Name       string `db:"name"`
@@ -165,6 +156,14 @@ type JsonModel struct {
 	UseCnt     int         `json:"useCnt"`
 	CreateTime int64       `json:"createTime"`
 	Params     *ParamsJson `json:"params"`
+}
+
+var DefaultParams = ParamsExtra{
+	DModel: "512",
+	NHeads: "8",
+	DFF:    "2048",
+	Embed:  "timeF",
+	Distil: "True",
 }
 
 func (p *Params) Parse() (args []string, err error) {
@@ -187,6 +186,72 @@ func (p *Params) Parse() (args []string, err error) {
 	}
 
 	return
+}
+
+func (p *ParamsJson) GetParams() *Params {
+	params := &Params{
+		TaskName:      p.PU.TaskName,
+		IsTraining:    p.PU.IsTraining,
+		ModelID:       p.PU.ModelID,
+		Model:         p.PU.Model,
+		Data:          p.PU.Data,
+		RootPath:      p.PU.RootPath,
+		DataPath:      p.PU.DataPath,
+		DataTrainPath: p.PU.DataTrainPath,
+		DataValiPath:  p.PU.DataValiPath,
+		DataTestPath:  p.PU.DataTestPath,
+		Features:      p.PU.Features,
+		Target:        p.PU.Target,
+		SeqLen:        p.PU.SeqLen,
+		LabelLen:      p.PU.LabelLen,
+		PredLen:       p.PU.PredLen,
+		EncIn:         p.PU.EncIn,
+		DecIn:         p.PU.DecIn,
+		COut:          p.PU.COut,
+		ELayers:       p.PU.ELayers,
+		DLayers:       p.PU.DLayers,
+		Factor:        p.PU.Factor,
+		Itr:           p.PU.Itr,
+		Des:           p.PU.Des,
+		UseKafka:      p.PU.UseKafka,
+		Scale:         p.PU.Scale,
+		Optim:         p.PU.Optim,
+	}
+	if p.UseExtra {
+		params.Freq = p.PE.Freq
+		params.Checkpoints = p.PE.Checkpoints
+		params.SeasonalPatterns = p.PE.SeasonalPatterns
+		params.MaskRate = p.PE.MaskRate
+		params.AnomalyRatio = p.PE.AnomalyRatio
+		params.TopK = p.PE.TopK
+		params.NumKernels = p.PE.NumKernels
+		params.DModel = p.PE.DModel
+		params.NHeads = p.PE.NHeads
+		params.DFF = p.PE.DFF
+		params.MovingAvg = p.PE.MovingAvg
+		params.Distil = p.PE.Distil
+		params.Dropout = p.PE.Dropout
+		params.Embed = p.PE.Embed
+		params.Activation = p.PE.Activation
+		params.OutputAttention = p.PE.OutputAttention
+		params.NumWorkers = p.PE.NumWorkers
+		params.TrainEpochs = p.PE.TrainEpochs
+		params.BatchSize = p.PE.BatchSize
+		params.Patience = p.PE.Patience
+		params.LearningRate = p.PE.LearningRate
+		params.Loss = p.PE.Loss
+		params.Lradj = p.PE.Lradj
+		params.UseAMP = p.PE.UseAMP
+		params.UseGPU = p.PE.UseGPU
+		params.GPU = p.PE.GPU
+		params.UseMultiGPU = p.PE.UseMultiGPU
+		params.Devices = p.PE.Devices
+		params.HiddenDims = p.PE.HiddenDims
+		params.HiddenLayers = p.PE.HiddenLayers
+		params.WeightLin = p.PE.WeightLin
+	}
+
+	return params
 }
 
 func (p *Params) IsStream() bool {

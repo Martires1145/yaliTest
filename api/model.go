@@ -62,7 +62,6 @@ func ModifyModel(c *gin.Context) {
 	useKafka := c.PostForm("useKafka")
 
 	err := server.ModifyModel(id, name, useKafka)
-
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
 	}
@@ -74,10 +73,20 @@ func ModifyModel(c *gin.Context) {
 //
 //	@Summary	使用模型
 //	@Tags		Model
+//	@Param		modelID	formData	string	true	"模型ID"
 //	@Router		/api/v1/md/use [post]
 func UseModel(c *gin.Context) {
-	// todo
-	panic("todo")
+	id := c.PostForm("modelID")
+
+	isStream, clientID, err := server.UseModel(id)
+	if err != nil {
+		response.Fail(c.Writer, err.Error(), 500)
+	}
+
+	response.Success(c.Writer, "success", gin.H{
+		"is_stream": isStream,
+		"client_id": clientID,
+	})
 }
 
 // CopyModel
@@ -113,9 +122,30 @@ func GetModel(c *gin.Context) {
 	response.Success(c.Writer, "success", models)
 }
 
+// UploadModelFile
+//
+//	@Tags		Model
+//	@Summary	上传checkPoint.pth文件到对应模型下
+//	@Accept		multipart/form-data
+//	@Produce	application/json
+//	@Param		file	formData	file	true	"pth文件"
+//	@Param		id		formData	int		true	"模型id"
+//	@Success	200		{object}	response.Response
+//	@Router		/api/v1/model/umf [post]
 func UploadModelFile(c *gin.Context) {
-	// todo
-	panic("todo")
+	id := c.PostForm("id")
+	fileData, err := c.FormFile("file")
+	if err != nil {
+		response.Fail(c.Writer, "wrong file data", 400)
+		return
+	}
+
+	err = server.SavePthFile(id, fileData)
+	if err != nil {
+		response.Fail(c.Writer, err.Error(), 500)
+	}
+
+	response.Success(c.Writer, "success", nil)
 }
 
 // GetModelParams

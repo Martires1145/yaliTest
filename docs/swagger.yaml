@@ -285,6 +285,8 @@ definitions:
         type: string
       model:
         type: string
+      model_id:
+        type: string
       optim:
         type: string
       pred_len:
@@ -748,8 +750,39 @@ paths:
       - Model
   /api/v1/md/use:
     post:
+      parameters:
+      - description: 模型ID
+        in: formData
+        name: modelID
+        required: true
+        type: string
       responses: {}
       summary: 使用模型
+      tags:
+      - Model
+  /api/v1/model/umf:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: pth文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 模型id
+        in: formData
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 上传checkPoint.pth文件到对应模型下
       tags:
       - Model
   /api/v1/rs:

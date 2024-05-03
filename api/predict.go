@@ -28,7 +28,7 @@ func RunScript(c *gin.Context) {
 	}
 
 	// 运行脚本
-	IsStream, err := server.Call(params)
+	IsStream, err := server.Call(&params)
 	if err != nil {
 		response.Fail(c.Writer, fmt.Sprintf("wrong params, err: %s", err.Error()), 400)
 		return

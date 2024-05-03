@@ -27864,143 +27864,147 @@ category_id</ColNames>
       <DasType>varchar(200)|0s</DasType>
       <Position>26</Position>
     </column>
-    <index id="5475" parent="778" name="PRIMARY">
+    <column id="5475" parent="778" name="model_id">
+      <DasType>int|0s</DasType>
+      <Position>27</Position>
+    </column>
+    <index id="5476" parent="778" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="5476" parent="778" name="PRIMARY">
+    <key id="5477" parent="778" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="5477" parent="779" name="uid">
+    <column id="5478" parent="779" name="uid">
       <AutoIncrement>1</AutoIncrement>
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="5478" parent="779" name="name">
+    <column id="5479" parent="779" name="name">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
     </column>
-    <column id="5479" parent="779" name="role">
+    <column id="5480" parent="779" name="role">
       <DasType>int|0s</DasType>
       <DefaultExpression>1</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>3</Position>
     </column>
-    <column id="5480" parent="779" name="user_name">
+    <column id="5481" parent="779" name="user_name">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
     </column>
-    <column id="5481" parent="779" name="pass_word">
+    <column id="5482" parent="779" name="pass_word">
       <DasType>varchar(100)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
     </column>
-    <column id="5482" parent="779" name="email">
+    <column id="5483" parent="779" name="email">
       <DasType>varchar(100)|0s</DasType>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>6</Position>
     </column>
-    <index id="5483" parent="779" name="PRIMARY">
+    <index id="5484" parent="779" name="PRIMARY">
       <ColNames>uid</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="5484" parent="779" name="PRIMARY">
+    <key id="5485" parent="779" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="5485" parent="780" name="id">
+    <column id="5486" parent="780" name="id">
       <AutoIncrement>1</AutoIncrement>
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="5486" parent="780" name="well_name">
+    <column id="5487" parent="780" name="well_name">
       <DasType>varchar(100)|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="5487" parent="780" name="life">
+    <column id="5488" parent="780" name="life">
       <DasType>int|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="5488" parent="780" name="address">
+    <column id="5489" parent="780" name="address">
       <DasType>varchar(200)|0s</DasType>
       <Position>4</Position>
     </column>
-    <column id="5489" parent="780" name="affiliation">
+    <column id="5490" parent="780" name="affiliation">
       <DasType>varchar(200)|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="5490" parent="780" name="depth">
+    <column id="5491" parent="780" name="depth">
       <DasType>int|0s</DasType>
       <Position>6</Position>
     </column>
-    <column id="5491" parent="780" name="construction">
+    <column id="5492" parent="780" name="construction">
       <DasType>int|0s</DasType>
       <Position>7</Position>
     </column>
-    <column id="5492" parent="780" name="borehole_size">
+    <column id="5493" parent="780" name="borehole_size">
       <DasType>int|0s</DasType>
       <Position>8</Position>
     </column>
-    <column id="5493" parent="780" name="finish_time">
+    <column id="5494" parent="780" name="finish_time">
       <DasType>bigint|0s</DasType>
       <Position>9</Position>
     </column>
-    <column id="5494" parent="780" name="average_daily_production">
+    <column id="5495" parent="780" name="average_daily_production">
       <DasType>int|0s</DasType>
       <Position>10</Position>
     </column>
-    <index id="5495" parent="780" name="PRIMARY">
+    <index id="5496" parent="780" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="5496" parent="780" name="PRIMARY">
+    <key id="5497" parent="780" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="5497" parent="781" name="id">
+    <column id="5498" parent="781" name="id">
       <AutoIncrement>1</AutoIncrement>
       <DasType>bigint|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
     </column>
-    <column id="5498" parent="781" name="well_name">
+    <column id="5499" parent="781" name="well_name">
       <DasType>varchar(50)|0s</DasType>
       <Position>2</Position>
     </column>
-    <column id="5499" parent="781" name="well_type">
+    <column id="5500" parent="781" name="well_type">
       <DasType>varchar(50)|0s</DasType>
       <Position>3</Position>
     </column>
-    <column id="5500" parent="781" name="note">
+    <column id="5501" parent="781" name="note">
       <DasType>varchar(200)|0s</DasType>
       <Position>4</Position>
     </column>
-    <column id="5501" parent="781" name="create_time">
+    <column id="5502" parent="781" name="create_time">
       <DasType>bigint|0s</DasType>
       <Position>5</Position>
     </column>
-    <column id="5502" parent="781" name="update_time">
+    <column id="5503" parent="781" name="update_time">
       <DasType>bigint|0s</DasType>
       <Position>6</Position>
     </column>
-    <index id="5503" parent="781" name="PRIMARY">
+    <index id="5504" parent="781" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="5504" parent="781" name="PRIMARY">
+    <key id="5505" parent="781" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>

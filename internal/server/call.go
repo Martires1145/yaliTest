@@ -12,7 +12,7 @@ var (
 	successMsg = viper.GetString("script.successMsg")
 )
 
-func Call(params model.Params) (bool, error) {
+func Call(params *model.Params) (bool, error) {
 	// 用于收集运行信息的管道
 	var runState chan string
 	runState = make(chan string)

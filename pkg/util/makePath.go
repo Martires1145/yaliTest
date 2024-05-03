@@ -1,6 +1,7 @@
 package util
 
 import (
+	"cmdTest/internal/dto/model"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -8,10 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 )
-
-func toString(now int64) string {
-	return fmt.Sprint(now)
-}
 
 func GetFile(path string) (f []string, err error) {
 	files, err := os.ReadDir(path)
@@ -31,7 +28,7 @@ func SaveFile(dst string, file *multipart.FileHeader) error {
 	if err != nil {
 		return err
 	}
-	defer src.Close()
+	defer src.Close().Error()
 
 	if err = os.MkdirAll(filepath.Dir(dst), 0750); err != nil {
 		return err
@@ -41,7 +38,7 @@ func SaveFile(dst string, file *multipart.FileHeader) error {
 	if err != nil {
 		return err
 	}
-	defer out.Close()
+	defer out.Close().Error()
 
 	_, err = io.Copy(out, src)
 	return err
@@ -74,4 +71,36 @@ func DeleteFile(path string) error {
 	}
 
 	return nil
+}
+
+func MakeModelPath(params *model.ParamsJson) string {
+	var paramsExtra *model.ParamsExtra
+	if params.UseExtra {
+		paramsExtra = params.PE
+	} else {
+		paramsExtra = &model.DefaultParams
+	}
+	path := fmt.Sprintf("%s_%s_%s_%s_ft%s_sl%s_ll%s_pl%s_dm%s_nh%s_el%s_dl%s_df%s_fc%s_eb%s_dt%s_sc%s_op%s_%s_%s",
+		params.PU.TaskName,
+		params.PU.ModelID,
+		params.PU.Model,
+		params.PU.Data,
+		params.PU.Features,
+		params.PU.SeqLen,
+		params.PU.LabelLen,
+		params.PU.PredLen,
+		paramsExtra.DModel,
+		paramsExtra.NHeads,
+		params.PU.ELayers,
+		params.PU.DLayers,
+		paramsExtra.DFF,
+		params.PU.Factor,
+		paramsExtra.Embed,
+		paramsExtra.Distil,
+		params.PU.Scale,
+		params.PU.Optim,
+		params.PU.Des,
+		"0",
+	)
+	return path
 }

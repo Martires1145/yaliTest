@@ -3,19 +3,25 @@ package server
 import (
 	"cmdTest/internal/dto/model"
 	"cmdTest/internal/dto/mysql"
+	"cmdTest/pkg/util"
+	"github.com/spf13/viper"
+	"mime/multipart"
 )
 
 var modelDaoMysql = mysql.ModelDaoMysql{}
+var modelPath = viper.GetString("model.path")
 
 func NewModel(modelData *model.JsonModel) error {
 	modelData.SetTime()
 
-	id, err := modelDaoMysql.NewParams(modelData.Params)
+	modelID, err := modelDaoMysql.NewModel(modelData)
+
+	id, err := modelDaoMysql.NewParams(modelData.Params, modelID)
 	if err != nil {
 		return err
 	}
 
-	return modelDaoMysql.NewModel(modelData, id)
+	return modelDaoMysql.UpdateModelParamsID(modelID, id)
 }
 
 func DeleteModel(id string) error {
@@ -42,4 +48,36 @@ func GetModelParams(id string) (*model.ParamsJson, error) {
 
 	params.SetUseExtra()
 	return params, nil
+}
+
+func SavePthFile(id string, file *multipart.FileHeader) error {
+	params, err := GetModelParams(id)
+	if err != nil {
+		return err
+	}
+
+	path := modelPath + util.MakeModelPath(params) + "checkPoint.pth"
+
+	return util.SaveFile(path, file)
+}
+
+func UseModel(id string) (isStream bool, clientID string, err error) {
+	params, err := modelDaoMysql.GetModelParams(id)
+	if err != nil {
+		return false, "", err
+	}
+
+	isStream, err = Call(params.GetParams())
+	if err != nil {
+		return false, "", err
+	}
+
+	clientID = util.GetClientID()
+	Conns[clientID] = nil
+
+	err = modelDaoMysql.UseModel(id)
+	if err != nil {
+		return false, "", err
+	}
+	return
 }

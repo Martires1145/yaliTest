@@ -616,7 +616,54 @@ const docTemplate = `{
                     "Model"
                 ],
                 "summary": "使用模型",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelID",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
                 "responses": {}
+            }
+        },
+        "/api/v1/model/umf": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Model"
+                ],
+                "summary": "上传checkPoint.pth文件到对应模型下",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "pth文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "模型id",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/rs": {
@@ -1312,6 +1359,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "model": {
+                    "type": "string"
+                },
+                "model_id": {
                     "type": "string"
                 },
                 "optim": {
