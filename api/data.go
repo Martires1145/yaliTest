@@ -101,12 +101,15 @@ func GetDataDetailRanged(c *gin.Context) {
 	from := c.PostForm("from")
 	to := c.PostForm("to")
 
-	rangeData, err := server.GetRangeData(id, from, to)
+	rangeDataT, rangeDataP, err := server.GetRangeData(id, from, to)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
 	}
 
-	response.Success(c.Writer, "success", rangeData)
+	response.Success(c.Writer, "success", gin.H{
+		"trueData":    rangeDataT,
+		"predictData": rangeDataP,
+	})
 }
 
 // DataDetailClose

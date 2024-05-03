@@ -13,7 +13,7 @@ import (
 	"sync"
 )
 
-type InFunction func(int64, int64) (*model.RangeData, error)
+type InFunction func(int64, int64) (*model.RangeData, *model.RangeData, error)
 type CloseFunction func() error
 type useCnt struct {
 	cnt int
@@ -117,6 +117,9 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 		}
 
 		tSum, pSum := getHistoryYaliSum(ty, py)
+
+		tStMax, pStMax := getHistoryYaliMaxSt(ty, py)
+		tStMin, pStMin := getHistoryYaliMinSt(ty, py)
 		for {
 			from, to, c := getInFunc()
 			if c == 1 {
@@ -125,32 +128,43 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 			fi, ti, err := getDataIndex(from, to, td)
 			if err != nil {
 				rangeDataChan <- nil
-				errorChan <- err
-				continue
-			}
-
-			rangeData, err := getRangeData(fi, ti, tSum, pSum)
-			if err != nil {
 				rangeDataChan <- nil
 				errorChan <- err
 				continue
 			}
 
-			rangeDataChan <- rangeData
+			rangeDataT, rangeDataP, err := getRangeData(
+				fi, ti,
+				tSum, tStMax, tStMin,
+				pSum, pStMax, pStMin,
+			)
+
+			if err != nil {
+				rangeDataChan <- nil
+				rangeDataChan <- nil
+				errorChan <- err
+				continue
+			}
+			rangeDataT.Yali = ty[fi : ti+1]
+			rangeDataP.Yali = py[fi : ti+1]
+
+			rangeDataChan <- rangeDataT
+			rangeDataChan <- rangeDataP
 			errorChan <- nil
 		}
 	}()
 
-	return func(from int64, to int64) (*model.RangeData, error) {
+	return func(from int64, to int64) (*model.RangeData, *model.RangeData, error) {
 			fromChan <- from
 			toChan <- to
 			closeChan <- 0
 			err := <-errorChan
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
-			rangeData := <-rangeDataChan
-			return rangeData, err
+			rangeDataT := <-rangeDataChan
+			rangeDataP := <-rangeDataChan
+			return rangeDataT, rangeDataP, err
 		},
 		func() error {
 			fromChan <- -1
@@ -162,18 +176,26 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 		}
 }
 
+func getHistoryYaliMaxSt(ty, py []float64) (*util.DataRangeMax, *util.DataRangeMax) {
+	return util.GetStMax(ty), util.GetStMax(py)
+}
+
+func getHistoryYaliMinSt(ty, py []float64) (*util.DataRangeMin, *util.DataRangeMin) {
+	return util.GetStMin(ty), util.GetStMin(py)
+}
+
 func getHistoryData(t string, p string) (td []model.Data, pd []model.Data, err error) {
 	openT, err := os.OpenFile(t, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer openT.Close()
+	defer openT.Close().Error()
 
 	openP, err := os.OpenFile(p, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer openP.Close()
+	defer openP.Close().Error()
 
 	err = gocsv.UnmarshalFile(openT, &td)
 	if err != nil {
@@ -188,9 +210,19 @@ func getHistoryData(t string, p string) (td []model.Data, pd []model.Data, err e
 	return
 }
 
-func getRangeData(fi, ti int, tSum []float64, pSum []float64) (*model.RangeData, error) {
-	// todo
-	panic("todo")
+func getRangeData(fi, ti int, features ...util.DataRangeFeatures) (tR *model.RangeData, pR *model.RangeData, err error) {
+	tR = &model.RangeData{}
+	pR = &model.RangeData{}
+
+	for i, feature := range features {
+		if i < len(features)/2 {
+			feature.GetFeatures(fi, ti, tR)
+		} else {
+			feature.GetFeatures(fi, ti, pR)
+		}
+	}
+
+	return nil, nil, err
 }
 
 func getHistoryYaliData(td, pd []model.Data) (ty []float64, py []float64, err error) {
@@ -215,7 +247,7 @@ func getHistoryYaliData(td, pd []model.Data) (ty []float64, py []float64, err er
 	return
 }
 
-func getHistoryYaliSum(ty, py []float64) (tSum []float64, pSum []float64) {
+func getHistoryYaliSum(ty, py []float64) (tSum util.DataRangeMean, pSum util.DataRangeMean) {
 	tSum = make([]float64, len(ty)+1)
 	pSum = make([]float64, len(py)+1)
 
@@ -246,15 +278,15 @@ func getDataIndex(from, to int64, td []model.Data) (fi int, ti int, err error) {
 	return
 }
 
-func GetRangeData(id, from, to string) (*model.RangeData, error) {
+func GetRangeData(id, from, to string) (*model.RangeData, *model.RangeData, error) {
 	f, _ := strconv.Atoi(from)
 	t, _ := strconv.Atoi(to)
 
 	inF := inMap[id]
 	mutex.Lock()
-	data, err := inF(int64(f), int64(t))
+	dataT, dataP, err := inF(int64(f), int64(t))
 	mutex.Unlock()
-	return data, err
+	return dataT, dataP, err
 }
 
 func DataDetailClose(id string) error {
