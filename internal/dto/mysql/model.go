@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"cmdTest/internal/dto/model"
+	"database/sql"
 	"fmt"
 )
 
@@ -78,18 +79,20 @@ func (m *ModelDaoMysql) NewParams(paramsData *model.ParamsJson, modelID int64) (
 					   :use_amp, :use_gpu, :gpu,
 					   :use_multi_gpu, :devices,:p_hidden_dims,
 					   :p_hidden_layers, :w_lin)`
+
+		_, err = tx.NamedExec(sqlStr, &paramsData.PE)
 	}
 
-	_, err = tx.NamedExec(sqlStr, &paramsData.PE)
 	return id, err
 }
 
 func (m *ModelDaoMysql) NewModel(modelData *model.JsonModel) (int64, error) {
-	sqlStr := `INSERT INTO models(name, create_time) VALUE (?, ?)`
+	sqlStr := `INSERT INTO models(name, create_time, use_extra) VALUE (?, ?, ?)`
 
 	exec, err := db.Exec(sqlStr,
 		modelData.Name,
 		modelData.CreateTime,
+		modelData.Params.UseExtra,
 	)
 
 	id, err := exec.LastInsertId()
@@ -117,15 +120,25 @@ func (m *ModelDaoMysql) DeleteModel(id string) error {
 	}()
 
 	sqlStr := `DELETE FROM params_extra
-			   WHERE id = (SELECT params_id FROM models WHERE models.id = ?)`
-	_, err = tx.Exec(sqlStr, id)
+			   WHERE id = (SELECT params_id FROM models WHERE models.id = ?) 
+			   AND (
+			   SELECT COUNT(1) FROM models WHERE params_id = (
+			   	SELECT params_id FROM models WHERE models.id = ?
+			                                )
+			   ) = 1`
+	_, err = tx.Exec(sqlStr, id, id)
 	if err != nil {
 		return err
 	}
 
 	sqlStr = `DELETE FROM params_usually
-			  WHERE id = (SELECT params_id FROM models WHERE models.id = ?)`
-	_, err = tx.Exec(sqlStr, id)
+			  WHERE id = (SELECT params_id FROM models WHERE models.id = ?)
+			  AND (
+			   SELECT COUNT(1) FROM models WHERE params_id = (
+			   	SELECT params_id FROM models WHERE models.id = ?
+			                                )
+			   ) = 1`
+	_, err = tx.Exec(sqlStr, id, id)
 	if err != nil {
 		return err
 	}
@@ -174,7 +187,7 @@ func (m *ModelDaoMysql) ModifyModel(id, name, useKafka string) error {
 func (m *ModelDaoMysql) CopyModel(id, name string) error {
 	sqlStr := `INSERT INTO
     		   models(name, use_cnt, use_extra, state, params_id, create_time)
-               SELECT ?, use_cnt, use_extra, state, params_id, create_time 
+               SELECT ?, use_cnt, use_extra, state, params_id, UNIX_TIMESTAMP(NOW())
                FROM models WHERE id = ?`
 	_, err := db.Exec(sqlStr, name, id)
 	return err
@@ -207,24 +220,31 @@ func (m *ModelDaoMysql) GetModelParams(id string) (*model.ParamsJson, error) {
 	}()
 
 	var params model.ParamsJson
+	params.PE = &model.ParamsExtra{}
+	params.PU = &model.ParamsUsual{}
+
 	sqlStr := `SELECT * 
 	           FROM params_usually 
-	           WHERE (SELECT params_id FROM models WHERE models.id = ?)`
-	err = tx.Get(&params.PU, sqlStr, id)
+	           WHERE id = (SELECT params_id FROM models WHERE models.id = ?)`
+	err = tx.Get(params.PU, sqlStr, id)
 	if err != nil {
 		return nil, err
 	}
 
 	sqlStr = `SELECT * 
 	           FROM params_extra 
-	           WHERE (SELECT params_id FROM models WHERE models.id = ?) `
-	err = tx.Get(&params.PE, sqlStr, id)
+	           WHERE id = (SELECT params_id FROM models WHERE models.id = ?)`
+	err = tx.Get(params.PE, sqlStr, id)
+	if err == sql.ErrNoRows {
+		err = nil
+		params.PE = nil
+	}
 	return &params, err
 }
 
 func (m *ModelDaoMysql) UpdateModelParamsID(modelID, paramsID int64) error {
 	sqlStr := "UPDATE models SET params_id = ? WHERE id = ?"
-	_, err := db.Exec(sqlStr, modelID, paramsID)
+	_, err := db.Exec(sqlStr, paramsID, modelID)
 	return err
 }
 

@@ -10,6 +10,7 @@ import (
 
 var modelDaoMysql = mysql.ModelDaoMysql{}
 var modelPath = viper.GetString("model.path")
+var checkpointsPath = viper.GetString("model.checkpoints")
 
 func NewModel(modelData *model.JsonModel) error {
 	modelData.SetTime()
@@ -56,7 +57,7 @@ func SavePthFile(id string, file *multipart.FileHeader) error {
 		return err
 	}
 
-	path := modelPath + util.MakeModelPath(params) + "checkPoint.pth"
+	path := modelPath + checkpointsPath + util.MakeModelPath(params)
 
 	return util.SaveFile(path, file)
 }

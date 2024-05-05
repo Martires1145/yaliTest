@@ -57,7 +57,7 @@ func ReviseWell(c *gin.Context) {
 //
 //	@Summary	删除井信息
 //	@Tags		Well
-//	@Param		wellID	body	int	true	"井ID"
+//	@Param		wellID	formData	int	true	"井ID"
 //	@Router		/api/v1/well/d [post]
 func DeleteWell(c *gin.Context) {
 	id := c.PostForm("wellID")

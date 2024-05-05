@@ -17,7 +17,7 @@ func GetFile(path string) (f []string, err error) {
 	}
 
 	for _, file := range files {
-		f = append(f, path+file.Name())
+		f = append(f, file.Name())
 	}
 
 	return
@@ -28,7 +28,7 @@ func SaveFile(dst string, file *multipart.FileHeader) error {
 	if err != nil {
 		return err
 	}
-	defer src.Close().Error()
+	defer src.Close()
 
 	if err = os.MkdirAll(filepath.Dir(dst), 0750); err != nil {
 		return err
@@ -38,11 +38,10 @@ func SaveFile(dst string, file *multipart.FileHeader) error {
 	if err != nil {
 		return err
 	}
-	defer out.Close().Error()
+	defer out.Close()
 
 	_, err = io.Copy(out, src)
 	return err
-
 }
 
 func DeleteFile(path string) error {
@@ -80,7 +79,7 @@ func MakeModelPath(params *model.ParamsJson) string {
 	} else {
 		paramsExtra = &model.DefaultParams
 	}
-	path := fmt.Sprintf("%s_%s_%s_%s_ft%s_sl%s_ll%s_pl%s_dm%s_nh%s_el%s_dl%s_df%s_fc%s_eb%s_dt%s_sc%s_op%s_%s_%s",
+	path := fmt.Sprintf("%s_%s_%s_%s_ft%s_sl%s_ll%s_pl%s_dm%s_nh%s_el%s_dl%s_df%s_fc%s_eb%s_dt%s_sc%s_op%s_%s_%s.pth",
 		params.PU.TaskName,
 		params.PU.ModelID,
 		params.PU.Model,

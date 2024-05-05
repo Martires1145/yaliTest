@@ -12,7 +12,7 @@ type DataRangeFeatures interface {
 type DataRangeMean []float64
 
 func (d DataRangeMean) GetFeatures(f, t int, rangeData *model.RangeData) {
-	rangeData.Mean = d[t+1] - d[f+1]/float64(t-f+1)
+	rangeData.Mean = (d[t+1] - d[f]) / float64(t-f+1)
 }
 
 func max(a, b float64) float64 {

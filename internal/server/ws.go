@@ -55,12 +55,12 @@ func Ws(w http.ResponseWriter, rq *http.Request, clientID string, isStream bool)
 
 	// 启动读写进程
 	if isStream {
-		go read(clientID, topicR)
+		go read(clientID, topicW)
 	}
-	go write(clientID, topicW)
+	go write(clientID, topicR)
 }
 
-func read(clientID, topicR string) {
+func read(clientID, topicW string) {
 	conn := Conns[clientID]
 
 	defer func() {
@@ -83,7 +83,7 @@ func read(clientID, topicR string) {
 			break
 		}
 
-		err = mq.WriteMsg(context.Background(), topicR, jsonD)
+		err = mq.WriteMsg(context.Background(), topicW, jsonD)
 		if err != nil {
 			log.Printf("[mqError] ==== err: %s", err.Error())
 			break
@@ -91,7 +91,7 @@ func read(clientID, topicR string) {
 	}
 }
 
-func write(clientID, topicW string) {
+func write(clientID, topicR string) {
 	conn := Conns[clientID]
 	pip := make(chan []byte, 3)
 
@@ -100,7 +100,7 @@ func write(clientID, topicW string) {
 		delete(Conns, clientID)
 	}()
 
-	go mq.ReadMsg(context.Background(), topicW, &pip)
+	go mq.ReadMsg(context.Background(), topicR, &pip)
 
 	for {
 		data := <-pip

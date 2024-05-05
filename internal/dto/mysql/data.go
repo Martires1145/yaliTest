@@ -39,6 +39,7 @@ func (d *DataDaoMysql) DeleteHistoryData(id string) (t string, f string, err err
 }
 
 func (d *DataDaoMysql) GetOneHistory(id string) (history *model.DataHistory, err error) {
+	history = &model.DataHistory{}
 	sqlStr := "SELECT * FROM histories WHERE id = ?"
 	err = db.Get(history, sqlStr, id)
 	return

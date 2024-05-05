@@ -43,6 +43,7 @@ func DeleteModel(c *gin.Context) {
 
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -64,6 +65,7 @@ func ModifyModel(c *gin.Context) {
 	err := server.ModifyModel(id, name, useKafka)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -81,6 +83,7 @@ func UseModel(c *gin.Context) {
 	isStream, clientID, err := server.UseModel(id)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", gin.H{
@@ -103,6 +106,7 @@ func CopyModel(c *gin.Context) {
 	err := server.CopyModel(id, name)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -117,6 +121,7 @@ func GetModel(c *gin.Context) {
 	models, err := server.GetAllModel()
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", models)
@@ -131,7 +136,7 @@ func GetModel(c *gin.Context) {
 //	@Param		file	formData	file	true	"pth文件"
 //	@Param		id		formData	int		true	"模型id"
 //	@Success	200		{object}	response.Response
-//	@Router		/api/v1/model/umf [post]
+//	@Router		/api/v1/md/umf [post]
 func UploadModelFile(c *gin.Context) {
 	id := c.PostForm("id")
 	fileData, err := c.FormFile("file")
@@ -143,6 +148,7 @@ func UploadModelFile(c *gin.Context) {
 	err = server.SavePthFile(id, fileData)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -152,14 +158,15 @@ func UploadModelFile(c *gin.Context) {
 //
 //	@Summary	获取模型参数
 //	@Tags		Model
-//	@Param		modelID	formData	string	true	"模型ID"
+//	@Param		modelID	query	string	true	"模型ID"
 //	@Router		/api/v1/md/params [get]
 func GetModelParams(c *gin.Context) {
-	id := c.PostForm("modelID")
+	id := c.Query("modelID")
 
 	params, err := server.GetModelParams(id)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", params)

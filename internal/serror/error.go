@@ -8,4 +8,5 @@ var (
 	WrongPassWordError = errors.New("password wrong")
 	NoSuchUserError    = errors.New("no such user")
 	WrongRangeError    = errors.New("wrong range error")
+	DetailCloseError   = errors.New("detail process closed")
 )

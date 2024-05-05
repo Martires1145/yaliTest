@@ -20,6 +20,7 @@ func File(c *gin.Context) {
 	files, err := server.GetFile(path)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", files)
@@ -46,6 +47,7 @@ func CsvUpload(c *gin.Context) {
 	err = server.SaveCsvFile(path, fileData)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -65,6 +67,7 @@ func NewFilePath(c *gin.Context) {
 	err := server.NewFilePath(path)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -81,6 +84,7 @@ func GetAllPath(c *gin.Context) {
 	paths, err := server.GetAllPath()
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", paths)
@@ -100,6 +104,7 @@ func DeletePath(c *gin.Context) {
 	err := server.DeletePath(filePath)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -121,6 +126,7 @@ func DeleteFile(c *gin.Context) {
 	err := server.DeleteFile(filePath, fileName)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)

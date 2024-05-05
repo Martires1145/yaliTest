@@ -2,17 +2,18 @@ package model
 
 import (
 	"encoding/json"
-	"strconv"
+	"fmt"
+	"time"
 )
 
 type Data struct {
 	Date          string `json:"date" csv:"date"`
-	YaliStage     string `json:"yali_stage" csv:"yali_stage"`
+	YaliStage     string `json:"yali_stage" csv:"yaliestage"`
 	Stage         string `json:"stage" csv:"stage"`
 	Taoya         string `json:"taoya" csv:"taoya"`
 	Paichu        string `json:"paichu" csv:"paichu"`
-	JieduanPaichu string `json:"jieduan_paichu" csv:"jieduan_paichu"`
-	Paichu1       string `json:"paichu_1" csv:"paichu_1"`
+	JieduanPaichu string `json:"jieduan_paichu" csv:"jieduanpaich"`
+	Paichu1       string `json:"paichu_1" csv:"paichu.1"`
 	Shanongdu     string `json:"shanongdu" csv:"shanongdu"`
 	Press         string `json:"press" csv:"press"`
 }
@@ -36,10 +37,9 @@ type DataHistoryJson struct {
 }
 
 type RangeData struct {
-	Max  float64   `json:"maxYali"`
-	Min  float64   `json:"min"`
-	Mean float64   `json:"mean"`
-	Yali []float64 `json:"yali"`
+	Max  float64 `json:"maxYali"`
+	Min  float64 `json:"min"`
+	Mean float64 `json:"mean"`
 }
 
 func (d *Data) Json() ([]byte, error) {
@@ -61,9 +61,23 @@ func MakeData(list []string) *Data {
 	}
 }
 
-func (d *Data) ParseTime() int64 {
-	// todo
-	t, _ := strconv.Atoi(d.Date)
-	return int64(t)
+func (d *Data) ParseTime(day string) int64 {
+	const layout = "2006-01-02 15:04:05"
 
+	// 使用time.Parse解析时间字符串
+	t, err := time.Parse(layout, day+d.Date)
+	if err != nil {
+		fmt.Println("Error parsing time:", err)
+		return 0
+	}
+	return t.Unix()
+}
+
+func (d DataHistory) GetDay() string {
+	t := time.Unix(d.CreateTime, 0)
+
+	// 使用Format方法将时间格式化为"2006-01-02"
+	formattedDate := t.Format("2006-01-02")
+
+	return formattedDate + " "
 }

@@ -17,8 +17,8 @@ func (m *UserDAOMysql) CreateUser(user *model.User) error {
 }
 
 func (m *UserDAOMysql) GetCaptcha(userName string) (captcha string, err error) {
-	sqlStr := "SELECT * FROM captcha WHERE username = ? AND begin = (SELECT max(begin) FROM captcha WHERE username = ?) AND begin > ?"
-	err = db.Select(&captcha, sqlStr, userName, userName, time.Now().Unix()-5*60)
+	sqlStr := "SELECT token FROM captcha WHERE username = ? AND begin > ? ORDER BY begin DESC LIMIT 1"
+	err = db.Get(&captcha, sqlStr, userName, time.Now().Unix()-5*60)
 	return
 }
 
@@ -30,19 +30,21 @@ func (m *UserDAOMysql) SaveCaptcha(userName, captcha string) error {
 
 func (m *UserDAOMysql) GetUserNameCnt(userName string) (cnt int, err error) {
 	sqlStr := "SELECT COUNT(1) FROM users WHERE user_name = ?"
-	err = db.Select(&cnt, sqlStr, userName)
+	err = db.Get(&cnt, sqlStr, userName)
 	return
 }
 
 func (m *UserDAOMysql) GetUserByUserName(userName string) (user *model.User, err error) {
+	user = &model.User{}
 	sqlStr := "SELECT * FROM users WHERE user_name = ?"
-	err = db.Select(&user, sqlStr, userName)
+	err = db.Get(user, sqlStr, userName)
 	return
 }
 
 func (m *UserDAOMysql) GetUserByUID(uid uint) (user *model.User, err error) {
+	user = &model.User{}
 	sqlStr := "SELECT * FROM users WHERE uid = ?"
-	err = db.Select(&user, sqlStr, uid)
+	err = db.Get(user, sqlStr, uid)
 	return
 }
 

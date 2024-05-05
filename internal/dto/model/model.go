@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var modelPath = viper.GetString("model.path")
+var modelPath = viper.GetString("model.path") + viper.GetString("model.name")
 
 type Params struct {
 	TaskName         string `json:"task_name" db:"task_name"`
@@ -167,7 +167,7 @@ var DefaultParams = ParamsExtra{
 }
 
 func (p *Params) Parse() (args []string, err error) {
-	args = append(args, "-m")
+	args = append(args, "-u")
 	args = append(args, modelPath)
 
 	bytes, err := json.Marshal(p)

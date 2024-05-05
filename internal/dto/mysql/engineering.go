@@ -58,7 +58,7 @@ func (e *EngineeringDaoMysql) NewEngineering(brief *model.EngineeringBrief, engi
 	if err != nil {
 		return -1, err
 	}
-	return -1, err
+	return id, err
 }
 
 func (e *EngineeringDaoMysql) NewDevice(devices []model.Device) error {
@@ -178,7 +178,7 @@ func (e *EngineeringDaoMysql) GetBriefEngineeringInfos() (briefInfos []model.Eng
 }
 
 func (e *EngineeringDaoMysql) GetEngineeringInfo(id string) (info *model.Engineering, err error) {
-	tx, err := db.Begin()
+	tx, err := db.Beginx()
 	if err != nil {
 		return nil, err
 	}
@@ -197,23 +197,22 @@ func (e *EngineeringDaoMysql) GetEngineeringInfo(id string) (info *model.Enginee
 		}
 	}()
 
+	info = &model.Engineering{}
 	sqlStr := "SELECT * FROM engineering WHERE id = ?"
-	rows, err := tx.Query(sqlStr, id)
+	err = tx.Get(info, sqlStr, id)
 	if err != nil {
 		return nil, err
 	}
 
-	err = rows.Scan(&info)
 	if err != nil {
 		return nil, err
 	}
 
 	sqlStr = "SELECT * FROM devices WHERE engineering_id = ?"
-	devices, err := tx.Query(sqlStr, id)
+	err = tx.Select(&info.Devices, sqlStr, id)
 	if err != nil {
 		return nil, err
 	}
 
-	err = devices.Scan(&info.Devices)
 	return
 }

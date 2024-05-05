@@ -15,6 +15,8 @@ func GetGin() *gin.Engine {
 	r.Use(api.Cors)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.Static("/true", "./static/true")
+	r.Static("/forecast", "./static/forecast")
 
 	r.POST("/api/v1/rs", api.RunScript)
 	r.GET("/api/v1/path", api.File)
@@ -28,7 +30,7 @@ func GetGin() *gin.Engine {
 		user.POST("/ru", api.UserRevise)
 		user.POST("/d", api.DeleteUser)
 		user.POST("/rp", api.ReSetUser)
-		user.GET("/cu", api.CheckUserName)
+		user.GET("/check", api.CheckUserName)
 		user.GET("/info", api.UserInfo)
 		user.GET("/all", api.GetAllUser)
 	}
@@ -75,7 +77,7 @@ func GetGin() *gin.Engine {
 		file.GET("/", api.File)
 	}
 
-	history := r.Group("/api/v1/history")
+	history := r.Group("/api/v1/data")
 	{
 		history.POST("/new", api.NewHistoryData)
 		history.POST("/delete", api.DeleteHistoryData)

@@ -80,12 +80,16 @@ func AddDevices(c *gin.Context) {
 //
 //	@Summary	删除施工设备
 //	@Tags		Engineering
-//	@Param		deviceIDs	formData	[]string	true	"要删除的设备ID"
+//	@Param		deviceIDs	body	[]string	true	"要删除的设备ID"
 //	@Router		/api/v1/en/device/delete [post]
 func DeleteDevices(c *gin.Context) {
-	IDs := c.PostFormArray("deviceIDs")
+	var IDs []string
+	err := c.ShouldBind(&IDs)
+	if err != nil {
+		response.Fail(c.Writer, "wrong data format", 400)
+	}
 
-	err := server.DeleteDevices(IDs)
+	err = server.DeleteDevices(IDs)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
 		return

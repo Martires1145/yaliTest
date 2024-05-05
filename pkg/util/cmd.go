@@ -34,7 +34,7 @@ func RunCmd(name string, args []string, runState chan string) {
 		for scanner.Scan() {
 			data, err := simplifiedchinese.GB18030.NewDecoder().Bytes(scanner.Bytes())
 			if err != nil {
-				fmt.Println("transfer serror with bytes:", scanner.Bytes())
+				fmt.Println("transfer error with bytes:", scanner.Bytes())
 				runState <- err.Error()
 				break
 			}

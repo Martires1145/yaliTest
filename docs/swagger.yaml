@@ -370,37 +370,8 @@ definitions:
 info:
   contact: {}
 paths:
-  /api/user/check:
-    get:
-      parameters:
-      - description: 用户名
-        in: formData
-        name: userName
-        required: true
-        type: string
-      responses: {}
-      summary: 检验用户名是否重复
-      tags:
-      - User
-  /api/user/login:
-    post:
-      parameters:
-      - description: 用户名
-        in: formData
-        name: userName
-        required: true
-        type: string
-      - description: 密码
-        in: formData
-        name: passWord
-        required: true
-        type: string
-      responses: {}
-      summary: 登录
-      tags:
-      - User
   /api/v1/data/all:
-    post:
+    get:
       produces:
       - application/json
       responses:
@@ -414,7 +385,7 @@ paths:
   /api/v1/data/dc:
     post:
       parameters:
-      - description: 使用模型时产生的历史数据id
+      - description: 历史数据id
         in: formData
         name: id
         required: true
@@ -450,7 +421,7 @@ paths:
   /api/v1/data/do:
     post:
       parameters:
-      - description: 使用模型时产生的历史数据id
+      - description: 历史数据id
         in: formData
         name: id
         required: true
@@ -465,21 +436,52 @@ paths:
       summary: 打开查看历史数据进程
       tags:
       - 历史数据模块
-  /api/v1/data/range:
+  /api/v1/data/new:
     post:
+      consumes:
+      - multipart/form-data
       parameters:
-      - description: 使用模型时产生的历史数据id
+      - description: 真实数据文件
         in: formData
+        name: fileTrue
+        required: true
+        type: file
+      - description: 预测数据文件
+        in: formData
+        name: filePredict
+        required: true
+        type: file
+      - description: 使用模型时产生的历史数据id
+        in: body
+        name: history
+        required: true
+        schema:
+          $ref: '#/definitions/model.DataHistoryJson'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 新建历史数据
+      tags:
+      - 历史数据模块
+  /api/v1/data/range:
+    get:
+      parameters:
+      - description: 历史数据id
+        in: query
         name: id
         required: true
         type: integer
       - description: 起始时间
-        in: formData
+        in: query
         name: from
         required: true
         type: integer
       - description: 截止时间
-        in: formData
+        in: query
         name: to
         required: true
         type: integer
@@ -490,7 +492,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: 获取范围历史数据
+      summary: 获取范围历史数据,0,0可以查看全部数据
       tags:
       - 历史数据模块
   /api/v1/dchan:
@@ -564,14 +566,14 @@ paths:
   /api/v1/en/device/delete:
     post:
       parameters:
-      - collectionFormat: csv
-        description: 要删除的设备ID
-        in: formData
-        items:
-          type: string
+      - description: 要删除的设备ID
+        in: body
         name: deviceIDs
         required: true
-        type: array
+        schema:
+          items:
+            type: string
+          type: array
       responses: {}
       summary: 删除施工设备
       tags:
@@ -718,37 +720,6 @@ paths:
       summary: 新建数据集文件夹
       tags:
       - 文件模块
-  /api/v1/history/uf:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: 真实数据文件
-        in: formData
-        name: fileTrue
-        required: true
-        type: file
-      - description: 预测数据文件
-        in: formData
-        name: filePredict
-        required: true
-        type: file
-      - description: 使用模型时产生的历史数据id
-        in: body
-        name: history
-        required: true
-        schema:
-          $ref: '#/definitions/model.DataHistoryJson'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: 新建历史数据
-      tags:
-      - 历史数据模块
   /api/v1/md/all:
     get:
       responses: {}
@@ -801,7 +772,7 @@ paths:
     get:
       parameters:
       - description: 模型ID
-        in: formData
+        in: query
         name: modelID
         required: true
         type: string
@@ -831,19 +802,7 @@ paths:
       summary: 修改模型
       tags:
       - Model
-  /api/v1/md/use:
-    post:
-      parameters:
-      - description: 模型ID
-        in: formData
-        name: modelID
-        required: true
-        type: string
-      responses: {}
-      summary: 使用模型
-      tags:
-      - Model
-  /api/v1/model/umf:
+  /api/v1/md/umf:
     post:
       consumes:
       - multipart/form-data
@@ -866,6 +825,18 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: 上传checkPoint.pth文件到对应模型下
+      tags:
+      - Model
+  /api/v1/md/use:
+    post:
+      parameters:
+      - description: 模型ID
+        in: formData
+        name: modelID
+        required: true
+        type: string
+      responses: {}
+      summary: 使用模型
       tags:
       - Model
   /api/v1/rs:
@@ -893,6 +864,18 @@ paths:
       summary: 获取全部用户信息
       tags:
       - User
+  /api/v1/user/check:
+    get:
+      parameters:
+      - description: 用户名
+        in: query
+        name: userName
+        required: true
+        type: string
+      responses: {}
+      summary: 检验用户名是否重复
+      tags:
+      - User
   /api/v1/user/d:
     post:
       parameters:
@@ -915,6 +898,23 @@ paths:
         type: string
       responses: {}
       summary: 获取当前登录用户信息
+      tags:
+      - User
+  /api/v1/user/login:
+    post:
+      parameters:
+      - description: 用户名
+        in: formData
+        name: userName
+        required: true
+        type: string
+      - description: 密码
+        in: formData
+        name: passWord
+        required: true
+        type: string
+      responses: {}
+      summary: 登录
       tags:
       - User
   /api/v1/user/new:
@@ -1005,11 +1005,10 @@ paths:
     post:
       parameters:
       - description: 井ID
-        in: body
+        in: formData
         name: wellID
         required: true
-        schema:
-          type: integer
+        type: integer
       responses: {}
       summary: 删除井信息
       tags:

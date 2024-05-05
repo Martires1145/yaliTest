@@ -55,10 +55,10 @@ func Verify(c *gin.Context) {
 //
 //	@Summary	检验用户名是否重复
 //	@Tags		User
-//	@Param		userName	formData	string	true	"用户名"
-//	@Router		/api/user/check [get]
+//	@Param		userName	query	string	true	"用户名"
+//	@Router		/api/v1/user/check [get]
 func CheckUserName(c *gin.Context) {
-	userName := c.PostForm("userName")
+	userName := c.Query("userName")
 
 	err := server.CheckUserName(userName)
 	if err != nil {
@@ -75,7 +75,7 @@ func CheckUserName(c *gin.Context) {
 //	@Tags		User
 //	@Param		userName	formData	string	true	"用户名"
 //	@Param		passWord	formData	string	true	"密码"
-//	@Router		/api/user/login [post]
+//	@Router		/api/v1/user/login [post]
 func Login(c *gin.Context) {
 	userName := c.PostForm("userName")
 	passWord := c.PostForm("passWord")

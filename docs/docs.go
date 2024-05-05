@@ -16,51 +16,8 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/user/check": {
-            "get": {
-                "tags": [
-                    "User"
-                ],
-                "summary": "检验用户名是否重复",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "用户名",
-                        "name": "userName",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/api/user/login": {
-            "post": {
-                "tags": [
-                    "User"
-                ],
-                "summary": "登录",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "用户名",
-                        "name": "userName",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "密码",
-                        "name": "passWord",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
         "/api/v1/data/all": {
-            "post": {
+            "get": {
                 "produces": [
                     "application/json"
                 ],
@@ -90,7 +47,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "使用模型时产生的历史数据id",
+                        "description": "历史数据id",
                         "name": "id",
                         "in": "formData",
                         "required": true
@@ -146,7 +103,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "使用模型时产生的历史数据id",
+                        "description": "历史数据id",
                         "name": "id",
                         "in": "formData",
                         "required": true
@@ -162,35 +119,82 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/data/range": {
+        "/api/v1/data/new": {
             "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "历史数据模块"
                 ],
-                "summary": "获取范围历史数据",
+                "summary": "新建历史数据",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "真实数据文件",
+                        "name": "fileTrue",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "预测数据文件",
+                        "name": "filePredict",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "description": "使用模型时产生的历史数据id",
+                        "name": "history",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DataHistoryJson"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/data/range": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "历史数据模块"
+                ],
+                "summary": "获取范围历史数据,0,0可以查看全部数据",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "使用模型时产生的历史数据id",
+                        "description": "历史数据id",
                         "name": "id",
-                        "in": "formData",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "integer",
                         "description": "起始时间",
                         "name": "from",
-                        "in": "formData",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "integer",
                         "description": "截止时间",
                         "name": "to",
-                        "in": "formData",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -297,15 +301,16 @@ const docTemplate = `{
                 "summary": "删除施工设备",
                 "parameters": [
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "collectionFormat": "csv",
                         "description": "要删除的设备ID",
                         "name": "deviceIDs",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {}
@@ -548,53 +553,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/history/uf": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "历史数据模块"
-                ],
-                "summary": "新建历史数据",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "真实数据文件",
-                        "name": "fileTrue",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "预测数据文件",
-                        "name": "filePredict",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "description": "使用模型时产生的历史数据id",
-                        "name": "history",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.DataHistoryJson"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/md/all": {
             "get": {
                 "tags": [
@@ -678,7 +636,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "模型ID",
                         "name": "modelID",
-                        "in": "formData",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -717,25 +675,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/v1/md/use": {
-            "post": {
-                "tags": [
-                    "Model"
-                ],
-                "summary": "使用模型",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "模型ID",
-                        "name": "modelID",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/api/v1/model/umf": {
+        "/api/v1/md/umf": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -771,6 +711,24 @@ const docTemplate = `{
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/md/use": {
+            "post": {
+                "tags": [
+                    "Model"
+                ],
+                "summary": "使用模型",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模型ID",
+                        "name": "modelID",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {}
             }
         },
         "/api/v1/rs": {
@@ -812,6 +770,24 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/api/v1/user/check": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "检验用户名是否重复",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户名",
+                        "name": "userName",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/api/v1/user/d": {
             "post": {
                 "tags": [
@@ -842,6 +818,31 @@ const docTemplate = `{
                         "description": "token",
                         "name": "Authorization",
                         "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/api/v1/user/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "登录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户名",
+                        "name": "userName",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "密码",
+                        "name": "passWord",
+                        "in": "formData",
                         "required": true
                     }
                 ],
@@ -964,13 +965,11 @@ const docTemplate = `{
                 "summary": "删除井信息",
                 "parameters": [
                     {
+                        "type": "integer",
                         "description": "井ID",
                         "name": "wellID",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {}

@@ -146,6 +146,7 @@ func (w *WellDAOMysql) GetBriefWellInfo() (infos []model.WellBrief, err error) {
 }
 
 func (w *WellDAOMysql) GetWellInfo(wellID string) (well *model.Well, err error) {
+	well = &model.Well{}
 	sqlStr := "SELECT * FROM well WHERE id = ?"
 	err = db.Get(well, sqlStr, wellID)
 	return

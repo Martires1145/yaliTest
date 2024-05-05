@@ -17,7 +17,7 @@ import (
 //	@Param		filePredict	formData	file					true	"预测数据文件"
 //	@Param		history		body		model.DataHistoryJson	true	"使用模型时产生的历史数据id"
 //	@Success	200			{object}	response.Response
-//	@Router		/api/v1/history/uf [post]
+//	@Router		/api/v1/data/new [post]
 func NewHistoryData(c *gin.Context) {
 	fileDataTrue, err := c.FormFile("fileTrue")
 	if err != nil {
@@ -25,14 +25,14 @@ func NewHistoryData(c *gin.Context) {
 		return
 	}
 
-	filePredict, err := c.FormFile("fileTrue")
+	filePredict, err := c.FormFile("filePredict")
 	if err != nil {
 		response.Fail(c.Writer, "wrong file data", 400)
 		return
 	}
 
 	var history model.DataHistoryJson
-	err = c.ShouldBindJSON(&history)
+	err = c.ShouldBind(&history)
 	if err != nil {
 		response.Fail(c.Writer, "wrong data format", 400)
 		return
@@ -41,6 +41,7 @@ func NewHistoryData(c *gin.Context) {
 	err = server.NewHistoryData(fileDataTrue, filePredict, &history)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -52,11 +53,12 @@ func NewHistoryData(c *gin.Context) {
 //	@Summary	查看所有历史数据
 //	@Produce	application/json
 //	@Success	200	{object}	response.Response
-//	@Router		/api/v1/data/all [post]
+//	@Router		/api/v1/data/all [get]
 func GetHistoryData(c *gin.Context) {
 	histories, err := server.GetHistoryData()
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", histories)
@@ -76,6 +78,7 @@ func DeleteHistoryData(c *gin.Context) {
 	err := server.DeleteHistoryData(id)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)
@@ -86,38 +89,40 @@ func DeleteHistoryData(c *gin.Context) {
 //	@Tags		历史数据模块
 //	@Summary	打开查看历史数据进程
 //	@Produce	application/json
-//	@Param		id	formData	int	true	"使用模型时产生的历史数据id"
+//	@Param		id	formData	int	true	"历史数据id"
 //	@Success	200	{object}	response.Response
 //	@Router		/api/v1/data/do [post]
 func DataDetailOpen(c *gin.Context) {
 	id := c.PostForm("id")
 
-	err := server.DataDetailOpen(id)
+	history, err := server.DataDetailOpen(id)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
-	response.Success(c.Writer, "success", nil)
+	response.Success(c.Writer, "success", history)
 }
 
 // GetDataDetailRanged
 //
 //	@Tags		历史数据模块
-//	@Summary	获取范围历史数据
+//	@Summary	获取范围历史数据,0,0可以查看全部数据
 //	@Produce	application/json
-//	@Param		id		formData	int	true	"使用模型时产生的历史数据id"
-//	@Param		from	formData	int	true	"起始时间"
-//	@Param		to		formData	int	true	"截止时间"
+//	@Param		id		query		int	true	"历史数据id"
+//	@Param		from	query		int	true	"起始时间"
+//	@Param		to		query		int	true	"截止时间"
 //	@Success	200		{object}	response.Response
-//	@Router		/api/v1/data/range [post]
+//	@Router		/api/v1/data/range [get]
 func GetDataDetailRanged(c *gin.Context) {
-	id := c.PostForm("id")
-	from := c.PostForm("from")
-	to := c.PostForm("to")
+	id := c.Query("id")
+	from := c.Query("from")
+	to := c.Query("to")
 
 	rangeDataT, rangeDataP, err := server.GetRangeData(id, from, to)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", gin.H{
@@ -131,7 +136,7 @@ func GetDataDetailRanged(c *gin.Context) {
 //	@Tags		历史数据模块
 //	@Summary	关闭查看历史数据进程
 //	@Produce	application/json
-//	@Param		id	formData	int	true	"使用模型时产生的历史数据id"
+//	@Param		id	formData	int	true	"历史数据id"
 //	@Success	200	{object}	response.Response
 //	@Router		/api/v1/data/dc [post]
 func DataDetailClose(c *gin.Context) {
@@ -140,6 +145,7 @@ func DataDetailClose(c *gin.Context) {
 	err := server.DataDetailClose(id)
 	if err != nil {
 		response.Fail(c.Writer, err.Error(), 500)
+		return
 	}
 
 	response.Success(c.Writer, "success", nil)

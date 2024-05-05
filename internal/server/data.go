@@ -11,6 +11,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type InFunction func(int64, int64) (*model.RangeData, *model.RangeData, error)
@@ -38,7 +39,7 @@ func NewHistoryData(fileTrue *multipart.FileHeader, filePredict *multipart.FileH
 		return err
 	}
 
-	tPath := truePath + filePredict.Filename
+	tPath := truePath + fileTrue.Filename
 	err = util.SaveFile(tPath, fileTrue)
 	if err != nil {
 		return err
@@ -48,7 +49,7 @@ func NewHistoryData(fileTrue *multipart.FileHeader, filePredict *multipart.FileH
 		ModelID:       history.ModelID,
 		WellID:        history.WellID,
 		EngineeringID: history.EngineeringID,
-		CreateTime:    history.CreateTime,
+		CreateTime:    time.Now().Unix(),
 		TrueDataPath:  fileTrue.Filename,
 		PDataPath:     filePredict.Filename,
 	})
@@ -74,17 +75,12 @@ func DeleteHistoryData(id string) error {
 	return util.DeleteFile(fp)
 }
 
-func DataDetailOpen(id string) error {
+func DataDetailOpen(id string) (history *model.DataHistory, err error) {
 	if cnt, ok := cntMap[id]; ok && cnt.cnt != 0 {
 		cntMap[id].Lock()
 		cntMap[id].cnt++
 		cntMap[id].Unlock()
-		return nil
-	} else if cnt.cnt == 0 {
-		delete(cntMap, id)
-		delete(cMap, id)
-		delete(inMap, id)
-		delete(hMap, id)
+		return hMap[id], nil
 	}
 
 	cntMap[id] = &useCnt{
@@ -92,20 +88,20 @@ func DataDetailOpen(id string) error {
 		Mutex: sync.Mutex{},
 	}
 
-	history, err := dataDaoMysql.GetOneHistory(id)
+	history, err = dataDaoMysql.GetOneHistory(id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	hMap[id] = history
 
-	inF, closeF := DataDetailProcess(id)
+	inF, closeF := DataDetailProcess(id, history.GetDay())
 	inMap[id] = inF
 	cMap[id] = closeF
 
-	return nil
+	return history, nil
 }
 
-func DataDetailProcess(id string) (InFunction, CloseFunction) {
+func DataDetailProcess(id, day string) (InFunction, CloseFunction) {
 	tp, pp := truePath+hMap[id].TrueDataPath, forecastPath+hMap[id].PDataPath
 	fromChan, toChan := make(chan int64), make(chan int64)
 	rangeDataChan, errorChan := make(chan *model.RangeData), make(chan error)
@@ -122,11 +118,13 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 		td, pd, err := getHistoryData(tp, pp)
 		if err != nil {
 			fmt.Println(err.Error())
+			return
 		}
 
 		ty, py, err := getHistoryYaliData(td, pd)
 		if err != nil {
 			fmt.Println(err.Error())
+			return
 		}
 
 		tSum, pSum := getHistoryYaliSum(ty, py)
@@ -136,16 +134,19 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 		for {
 			from, to, c := getInFunc()
 			if c == 1 {
+				errorChan <- nil
 				break
 			}
-			fi, ti, err := getDataIndex(from, to, td)
-			if err != nil {
-				rangeDataChan <- nil
-				rangeDataChan <- nil
-				errorChan <- err
-				continue
+			var fi, ti int
+			if from == to && to == 0 {
+				fi, ti = 0, len(pd)-1
+			} else {
+				fi, ti, err = getDataIndex(from, to, td, day)
+				if err != nil {
+					errorChan <- err
+					continue
+				}
 			}
-
 			rangeDataT, rangeDataP, err := getRangeData(
 				fi, ti,
 				tSum, tStMax, tStMin,
@@ -153,17 +154,13 @@ func DataDetailProcess(id string) (InFunction, CloseFunction) {
 			)
 
 			if err != nil {
-				rangeDataChan <- nil
-				rangeDataChan <- nil
 				errorChan <- err
 				continue
 			}
-			rangeDataT.Yali = ty[fi : ti+1]
-			rangeDataP.Yali = py[fi : ti+1]
 
+			errorChan <- nil
 			rangeDataChan <- rangeDataT
 			rangeDataChan <- rangeDataP
-			errorChan <- nil
 		}
 	}()
 
@@ -202,13 +199,13 @@ func getHistoryData(t string, p string) (td []model.Data, pd []model.Data, err e
 	if err != nil {
 		return nil, nil, err
 	}
-	defer openT.Close().Error()
+	defer openT.Close()
 
 	openP, err := os.OpenFile(p, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer openP.Close().Error()
+	defer openP.Close()
 
 	err = gocsv.UnmarshalFile(openT, &td)
 	if err != nil {
@@ -235,7 +232,7 @@ func getRangeData(fi, ti int, features ...util.DataRangeFeatures) (tR *model.Ran
 		}
 	}
 
-	return nil, nil, err
+	return
 }
 
 func getHistoryYaliData(td, pd []model.Data) (ty []float64, py []float64, err error) {
@@ -254,7 +251,7 @@ func getHistoryYaliData(td, pd []model.Data) (ty []float64, py []float64, err er
 		if err != nil {
 			return nil, nil, err
 		}
-		ty = append(py, yaliFloat)
+		py = append(py, yaliFloat)
 	}
 
 	return
@@ -275,16 +272,16 @@ func getHistoryYaliSum(ty, py []float64) (tSum util.DataRangeMean, pSum util.Dat
 	return
 }
 
-func getDataIndex(from, to int64, td []model.Data) (fi int, ti int, err error) {
+func getDataIndex(from, to int64, td []model.Data, day string) (fi int, ti int, err error) {
 	for i := range td {
-		if td[i].ParseTime() == from {
+		if td[i].ParseTime(day) == from {
 			fi = i
-		} else if td[i].ParseTime() == to {
+		} else if td[i].ParseTime(day) == to {
 			ti = i
 		}
 	}
 
-	if fi <= ti {
+	if (fi == ti && fi == 0) || fi > ti {
 		return -1, -1, serror.WrongRangeError
 	}
 
@@ -295,7 +292,10 @@ func GetRangeData(id, from, to string) (*model.RangeData, *model.RangeData, erro
 	f, _ := strconv.Atoi(from)
 	t, _ := strconv.Atoi(to)
 
-	inF := inMap[id]
+	inF, ok := inMap[id]
+	if !ok {
+		return nil, nil, serror.DetailCloseError
+	}
 	mutex.Lock()
 	dataT, dataP, err := inF(int64(f), int64(t))
 	mutex.Unlock()
@@ -303,13 +303,26 @@ func GetRangeData(id, from, to string) (*model.RangeData, *model.RangeData, erro
 }
 
 func DataDetailClose(id string) error {
-	cntMap[id].Lock()
-	cntMap[id].cnt--
-	if cntMap[id].cnt == 0 {
+	cnt, ok := cntMap[id]
+	if !ok {
+		return serror.DetailCloseError
+	}
+	cnt.Lock()
+	cnt.cnt--
+	if cnt.cnt == 0 {
 		c := cMap[id]
 		err := c()
-		return err
+		if err != nil {
+			return err
+		}
 	}
-	cntMap[id].Unlock()
+	cnt.Unlock()
+
+	if cnt.cnt == 0 {
+		delete(cntMap, id)
+		delete(cMap, id)
+		delete(inMap, id)
+		delete(hMap, id)
+	}
 	return nil
 }

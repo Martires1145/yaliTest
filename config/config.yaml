@@ -1,35 +1,37 @@
 web:
-  host: 127.0.0.1
-  port: :8088
-  time: 2024-4-10
+  host:
+  port:
+  time:
 script:
-  cmdName: python
-  successMsg: 启动成功
+  cmdName:
+  successMsg:
 model:
-  path: ""
+  path:
+  name:
+  checkpoints:
 kafka:
-  topic1: test1
-  topic2: test1
-  finishMsg: finish
-  host: 124.222.126.172:9092
-  timeOut: time out
+  topic1:
+  topic2:
+  finishMsg:
+  host:
+  timeOut:
 jwt:
-  token: helloWorld
-  issuer: may1145
+  token:
+  issuer:
 redis:
-  addr:  localhost
+  addr:
   password:
-  db: 0
-  poolsize: 10
+  db:
+  poolsize:
 email:
-  account: 2928229132@qq.com
-  password: dgovuilfebztdeae
+  account:
+  password:
 mysql:
-  host: 127.0.0.1
-  port: 3306
-  database: yali_test
-  username: root
-  password: Cherry1145
-  charset: utf8mb3
+  host:
+  port:
+  database:
+  username:
+  password:
+  charset:
 user:
-  default: ""
+  default:
