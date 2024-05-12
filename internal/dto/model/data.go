@@ -37,9 +37,10 @@ type DataHistoryJson struct {
 }
 
 type RangeData struct {
-	Max  float64 `json:"maxYali"`
-	Min  float64 `json:"min"`
-	Mean float64 `json:"mean"`
+	Max      float64 `json:"maxYali"`
+	Min      float64 `json:"min"`
+	Mean     float64 `json:"mean"`
+	Variance float64 `json:"variance"`
 }
 
 func (d *Data) Json() ([]byte, error) {

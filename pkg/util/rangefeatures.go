@@ -112,3 +112,12 @@ func (d *DataRangeMin) GetFeatures(f, t int, rangData *model.RangeData) {
 	k := d.Log[t-f+1]
 	rangData.Min = min(d.Min[k][f], d.Min[k][t-(1<<k)+1])
 }
+
+type DataRangeVariance struct {
+	Sum       []float64
+	SquareSum []float64
+}
+
+func (d *DataRangeVariance) GetFeatures(f, t int, rangData *model.RangeData) {
+	rangData.Variance = (d.SquareSum[t+1]-d.SquareSum[f])/float64(t-f+1) - (d.Sum[t+1]-d.Sum[f])/float64(t-f+1)
+}

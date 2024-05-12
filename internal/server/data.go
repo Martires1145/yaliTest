@@ -131,6 +131,8 @@ func DataDetailProcess(id, day string) (InFunction, CloseFunction) {
 
 		tStMax, pStMax := getHistoryYaliMaxSt(ty, py)
 		tStMin, pStMin := getHistoryYaliMinSt(ty, py)
+
+		tVariance, pVariance := getHistoryYaliVariance(ty, py, tSum, pSum)
 		for {
 			from, to, c := getInFunc()
 			if c == 1 {
@@ -149,8 +151,8 @@ func DataDetailProcess(id, day string) (InFunction, CloseFunction) {
 			}
 			rangeDataT, rangeDataP, err := getRangeData(
 				fi, ti,
-				tSum, tStMax, tStMin,
-				pSum, pStMax, pStMin,
+				tSum, tStMax, tStMin, tVariance,
+				pSum, pStMax, pStMin, pVariance,
 			)
 
 			if err != nil {
@@ -192,6 +194,27 @@ func getHistoryYaliMaxSt(ty, py []float64) (*util.DataRangeMax, *util.DataRangeM
 
 func getHistoryYaliMinSt(ty, py []float64) (*util.DataRangeMin, *util.DataRangeMin) {
 	return util.GetStMin(ty), util.GetStMin(py)
+}
+
+func getHistoryYaliVariance(ty, py, tSum, pSum []float64) (*util.DataRangeVariance, *util.DataRangeVariance) {
+	tSquareSum := make([]float64, len(ty)+1)
+	pSquareSum := make([]float64, len(py)+1)
+
+	for i := 1; i < len(ty); i++ {
+		tSum[i] = tSum[i-1] + ty[i-1]*ty[i-1]
+	}
+
+	for i := 1; i < len(py); i++ {
+		pSum[i] = pSum[i-1] + py[i-1]*py[i-1]
+	}
+
+	return &util.DataRangeVariance{
+			Sum:       tSum,
+			SquareSum: tSquareSum,
+		}, &util.DataRangeVariance{
+			Sum:       pSum,
+			SquareSum: pSquareSum,
+		}
 }
 
 func getHistoryData(t string, p string) (td []model.Data, pd []model.Data, err error) {
