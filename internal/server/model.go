@@ -68,7 +68,7 @@ func UseModel(id string) (isStream bool, clientID string, err error) {
 		return false, "", err
 	}
 
-	isStream, err = Call(params.GetParams())
+	isStream, err = CallByKafka(params.GetParams())
 	if err != nil {
 		return false, "", err
 	}

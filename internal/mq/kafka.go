@@ -2,6 +2,8 @@ package mq
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/segmentio/kafka-go"
 	"github.com/spf13/viper"
@@ -104,6 +106,29 @@ func WriteTopicAck(ctx context.Context, topic string) {
 			fmt.Printf("写入完成")
 		}
 	}
+}
+
+func WriteParams(ctx context.Context, params []byte) error {
+	return WriteMsg(ctx, topic2, params)
+}
+
+func ReadParamsResult(ctx context.Context) (bool, error) {
+	dataChan := make(chan []byte)
+	ReadMsg(ctx, topic2, &dataChan)
+
+	data := <-dataChan
+	result := make(map[string]any)
+
+	err := json.Unmarshal(data, &result)
+	if err != nil {
+		return false, err
+	}
+
+	if useKafka, ok := result["is_stream"]; ok {
+		return useKafka.(bool), nil
+	}
+
+	return false, errors.New(result["err"].(string))
 }
 
 func WriteMsg(ctx context.Context, topic string, msg []byte) error {

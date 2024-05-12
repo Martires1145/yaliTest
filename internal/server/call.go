@@ -2,7 +2,10 @@ package server
 
 import (
 	"cmdTest/internal/dto/model"
+	"cmdTest/internal/mq"
 	"cmdTest/pkg/util"
+	"context"
+	"encoding/json"
 	"errors"
 	"github.com/spf13/viper"
 )
@@ -35,4 +38,19 @@ func Call(params *model.Params) (bool, error) {
 
 	// 查看是否要启动kafka流式传输
 	return params.IsStream(), nil
+}
+
+func CallByKafka(params *model.Params) (bool, error) {
+	// 处理数据
+	paramsJson, _ := json.Marshal(params)
+
+	// 发送参数
+	err := mq.WriteParams(context.Background(), paramsJson)
+	if err != nil {
+		return false, err
+	}
+
+	// 获取结果
+	useKafka, err := mq.ReadParamsResult(context.Background())
+	return useKafka, err
 }

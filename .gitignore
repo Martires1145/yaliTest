@@ -3,7 +3,7 @@
 #
 # Binaries for programs and plugins
 *.exe
-*.yaml
+*.yaml~
 *.exe~
 *.dll
 *.so
