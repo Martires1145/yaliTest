@@ -1,29 +1,31 @@
 web:
-  host:
-  port:
-  time:
+  host: 127.0.0.1
+  port:  # example :8080
+  time:  # example 2024-6-1
 script:
-  cmdName:
-  successMsg:
+  cmdName:  # the command run your model such as python
+  successMsg:  # fixed output information when the model is successfully launched, for example success
 model:
-  path:
-  name:
-  checkpoints:
+  path:  # model path, example etc/model
+  name:  # model name, example transformer.py
+  checkpoints:  # checkpoints file path, example etc/model/checkpoint
 kafka:
-  topic1:
-  topic2:
-  finishMsg:
-  host:
-  timeOut:
+  topic1:  # topic used for exchanging communication topics
+  topic2:  # topic used to start the model
+  finishMsg:   # the information output after the model is completed, for example finish
+  host:  # host of kafka, example xx.xx.xx.xx:9092
+  timeOut: # the information output when time out, for example time out
 jwt:
-  token:
-  issuer:
+  token: helloWorld
+  issuer: may1145
 redis:
   addr:
   password:
   db:
   poolsize:
 email:
+  host:  # example smtp.qq.com
+  port:  # example 465
   account:
   password:
 mysql:
@@ -34,4 +36,4 @@ mysql:
   password:
   charset:
 user:
-  default:
+  default: may1145 # default password for all user

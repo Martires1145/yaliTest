@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	mailer = gomail.NewDialer("smtp.qq.com", 465, viper.GetString("email.account"), viper.GetString("email.password"))
+	mailer = gomail.NewDialer(viper.GetString("email.host"), viper.GetInt("email.port"), viper.GetString("email.account"), viper.GetString("email.password"))
 )
 
 func getCaptcha() string {
