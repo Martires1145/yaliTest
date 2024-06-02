@@ -45,11 +45,16 @@ func NewHistoryData(fileTrue *multipart.FileHeader, filePredict *multipart.FileH
 		return err
 	}
 
+	// 获取时间
+	now := time.Now()
+	// 截断到今天的开始时间（0:00:00）
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+
 	return dataDaoMysql.SaveDataHistory(&model.DataHistory{
 		ModelID:       history.ModelID,
 		WellID:        history.WellID,
 		EngineeringID: history.EngineeringID,
-		CreateTime:    time.Now().Unix(),
+		CreateTime:    today.Unix(),
 		TrueDataPath:  fileTrue.Filename,
 		PDataPath:     filePredict.Filename,
 	})
@@ -200,12 +205,12 @@ func getHistoryYaliVariance(ty, py, tSum, pSum []float64) (*util.DataRangeVarian
 	tSquareSum := make([]float64, len(ty)+1)
 	pSquareSum := make([]float64, len(py)+1)
 
-	for i := 1; i < len(ty); i++ {
-		tSum[i] = tSum[i-1] + ty[i-1]*ty[i-1]
+	for i := 1; i <= len(ty); i++ {
+		tSquareSum[i] = tSquareSum[i-1] + ty[i-1]*ty[i-1]
 	}
 
-	for i := 1; i < len(py); i++ {
-		pSum[i] = pSum[i-1] + py[i-1]*py[i-1]
+	for i := 1; i <= len(py); i++ {
+		pSquareSum[i] = pSquareSum[i-1] + py[i-1]*py[i-1]
 	}
 
 	return &util.DataRangeVariance{
